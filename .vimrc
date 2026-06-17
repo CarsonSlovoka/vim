@@ -1175,6 +1175,7 @@ augroup PluginGit
       echo "No more changes in this direction."
     endif
   endfunction
+  " TODO 但如果設定了之後，原本在 :difft 中的跳轉就不能用了
   nnoremap ]c :call GitGutterJump('next')<CR>
   nnoremap [c :call GitGutterJump('prev')<CR>
 augroup END
