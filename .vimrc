@@ -958,6 +958,38 @@ augroup PluginGitlist
 
   command! -nargs=* -complete=customlist,s:GitListComplete Gitllist
          \ call s:GitListToList(v:true, <f-args>)
+
+  " 底下也行，是簡易的版本
+  "function! s:GitLsFiles(is_loclist, options)
+  "  execute 'lcd' fnameescape(expand('%:h'))
+  "  let l:output = system('git rev-parse --show-toplevel')
+  "  if v:shell_error
+  "    echo "Not a git repository or git command error"
+  "    return
+  "  endif
+  "  let l:git_root = substitute(l:output , '\n$', '', '')
+  "  execute 'lcd' fnameescape(l:git_root)
+  "
+  "  let l:cmd = 'git ls-files --full-name '
+  "  let l:lines = systemlist(cmd)
+  "
+  "  let what = {
+  "      \ 'title': cmd,
+  "      \ 'lines': l:lines,
+  "      \ 'efm': '%f'
+  "      \ }
+  "
+  "  if a:is_loclist
+  "      call setloclist(0, [], get(a:options, 'action', ' '), what)
+  "      lopen
+  "  else
+  "      call setqflist([], get(a:options, 'action', ' '), what)
+  "      copen
+  "  endif
+  "endfunction
+  "command! Gitclist call s:GitLsFiles(v:false, {})
+  "command! Gitllist call s:GitLsFiles(v:true, {})
+
 augroup END
 
 
@@ -1155,38 +1187,6 @@ augroup PluginGit
     lopen
     lfirst
   endfunction
-
-  function! GitLsFiles(is_loclist, options, args)
-    execute 'lcd' fnameescape(expand('%:h'))
-    let l:output = system('git status -s')
-    if v:shell_error
-      echo "Not a git repository or git command error"
-      return
-    endif
-    let l:git_root = substitute(l:output , '\n$', '', '')
-    execute 'lcd' fnameescape(l:git_root)
-
-    let cmd = 'git ls-files --full-name ' . join(a:args, ' ')
-    let lines = systemlist(cmd)
-
-    let what = {
-        \ 'title': cmd,
-        \ 'lines': lines,
-        \ 'efm': '%f'
-        \ }
-
-    if a:is_loclist
-        call setloclist(0, [], get(a:options, 'action', ' '), what)
-        lopen
-    else
-        call setqflist([], get(a:options, 'action', ' '), what)
-        copen
-    endif
-
-  endfunction
-  command! -buffer Gitclist call GitLsFiles(true, ' ', [])
-  command! -buffer Gitllist call GitLsFiles(false, ' ', [])
-
 
   "" 定義符號樣式 (在行號欄位顯示)
   "set signcolumn=yes
