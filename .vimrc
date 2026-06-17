@@ -540,6 +540,7 @@ function! s:HelpOnSelection() range
 endfunction
 
 " Caution: 一定要補上`filetype plugin indent on`，那麼用 &commentstring " 才會是給正確的
+" Note: `filetype plugin indent on` 也可以讓 `=` 的格式化正確, 如果沒有開啟用 " = 不會對
 filetype plugin indent on
 packadd comment
 " function! ToggleComment()
