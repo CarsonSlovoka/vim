@@ -484,7 +484,8 @@ augroup Formatting
   autocmd FileType sh,bash,zsh command! -buffer -range FmtCurl s/ -/ \\\r -/g
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
-  autocmd FileType go command! -buffer FmtGo %!gofmt
+  autocmd FileType go          command! -buffer FmtGo  %!gofmt
+  autocmd FileType xml         command! -buffer FmtXml %!xmlstarlet fo
 augroup END
 
 
