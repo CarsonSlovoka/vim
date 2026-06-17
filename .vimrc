@@ -599,7 +599,11 @@ augroup PluginBookmark
 
   " 補全功能
   function! BookmarkComplete(A, L, P)
-    return keys(g:bookmarks)
+    if empty(a:A)
+      return keys(g:bookmarks)
+    endif
+
+    return matchfuzzy(keys(g:bookmarks), a:A)
   endfunction
 
   " 儲存到 viminfo 或檔案，讓重開 Vim 還在(它能保存全域變數，也就是g:的所有內容)
