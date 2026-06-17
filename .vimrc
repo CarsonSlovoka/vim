@@ -246,6 +246,15 @@ hi DiagnosticHint   guifg=#8b949e
 
 
 " 🟧 keymap
+
+if $TERM_PROGRAM ==# 'Apple_Terminal'
+  " <A-x> = \ex  使如果用Terimanl且將option改為Meta時 A-x 的熱鍵也能生效
+  " echo 'Apple_Terminal'
+  for c in split('abcdefghijklmnopqrstuvwxyz', '\zs')
+    execute "set <A-".c.">=\e".c
+  endfor
+endif
+
 nnoremap Q :q<CR>
 
 vnoremap <leader>y "+y
