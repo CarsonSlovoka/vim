@@ -1131,38 +1131,70 @@ augroup PluginGit
 
 
   "" 定義符號樣式 (在行號欄位顯示)
-  hi SignColumn guibg=NONE ctermbg=NONE
-  hi DiffAdd ctermfg=Green ctermbg=NONE
+  "set signcolumn=yes
+  "set updatetime=300
+  "hi SignColumn guibg=NONE ctermbg=NONE
+  hi DiffAdd    ctermfg=Green  ctermbg=NONE
   hi DiffChange ctermfg=Yellow ctermbg=NONE
-  sign define GitAdd text=+ texthl=DiffAdd
+  hi DiffDelete ctermfg=Red    ctermbg=NONE
+  sign define GitAdd    text=+ texthl=DiffAdd
   sign define GitChange text=! texthl=DiffChange
   sign define GitDelete text=- texthl=DiffDelete
 
   function! UpdateGitSigns()
-      " 1. 取得當前 buffer 的編號與路徑
-      let l:buf = bufnr('')
-      let l:file = expand('%')
+    " 1. 取得當前 buffer 的編號與路徑
+    let l:buf = bufnr('')
+    let l:file = expand('%')
 
-      " 若檔案不存在於磁碟上或為空，則跳過
-      if empty(l:file) | return | endif
+    " 若檔案不存在於磁碟上或為空，則跳過
+    if empty(l:file) || !filereadable(l:file)
+      return
+    endif
 
-      " 2. 清除該 buffer 所有已存在的標記
-      execute 'sign unplace * buffer=' . l:buf
+    " Get unified diff with 0 context
+    let l:diff = system('git --no-pager diff -U0 --relative -- ' . shellescape(l:file))
+    if v:shell_error || empty(l:diff)
+        return
+    endif
 
-      " 3. 抓取當前檔案的異動行號
-      " 加入 '-- ' . l:file 限制只針對當前檔案進行 diff
-      let l:cmd = "git --no-pager diff -U0 --relative -- " . shellescape(l:file) . " | grep '^@@' | awk '{print $3}' | sed 's/+//'"
-      let l:lines = split(system(l:cmd), '\n')
+    let l:lines = split(l:diff, '\n')
+    let l:id = 1
+    let l:current_line = 0
 
-      " 4. 重新放置標記
-      let l:id = 1
-      for l:ln in l:lines
-          let l:line_num = str2nr(l:ln)
-          if l:line_num > 0
-              execute 'sign place ' . l:id . ' line=' . l:line_num . ' name=GitAdd buffer=' . l:buf
-              let l:id += 1
+    for l:line in l:lines
+      " Parse hunk header: @@ -old_start,old_count +new_start,new_count @@
+      if l:line =~ '^@@'
+        let l:parts = matchlist(l:line, '^@@ -\d\+,\?\d* +\(\d\+\),\?\(\d*\) @@')
+        if len(l:parts) >= 2
+          let l:new_start = str2nr(l:parts[1])
+          let l:count = str2nr(get(l:parts, 2, 1))
+          let l:current_line = l:new_start
+        endif
+        continue
+      endif
+
+      " Process lines inside the hunk
+      if l:line =~ '^[ +]'
+        if l:current_line > 0
+          if l:line[0] == '+'
+            " Added line
+            execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitAdd buffer=' . l:buf
+          else
+            " Changed line (context or modified)
+            execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
           endif
-      endfor
+          let l:id += 1
+        endif
+        let l:current_line += 1
+      elseif l:line =~ '^-'
+        " Deletion - place delete sign on the next line (common behavior)
+        if l:current_line > 0
+          execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitDelete buffer=' . l:buf
+          let l:id += 1
+        endif
+        " Do not increment current_line for deletions
+      endif
+    endfor
   endfunction
 
   " 當存檔或進入緩衝區時自動更新
