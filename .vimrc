@@ -119,9 +119,11 @@ set statusline+=%r                      " Read-only flag [RO]
 set statusline+=%h                      " Help buffer flag [help]
 set statusline+=%w                      " Preview window flag [Preview]
 
-" 4. Divider: everything after this character moves to the right side
-" set statusline+=%=
+set statusline+=%=
 " set statusline+=\ %{searchcount().current}/%{searchcount().total}  " 好處是離開search時還能看到, 甚致曉得到當前第幾個, 但不用的時候就很礙眼
+set statusline+=\ %=%{ChecklistStatus()}
+
+" 4. Divider: everything after this character moves to the right side
 set statusline+=%=
 
 " 5. Build the right side of the statusline
@@ -241,6 +243,12 @@ hi DiffAdd          guifg=#aff5b4 guibg=#033a16
 hi DiffDelete       guifg=#ffdcd7 guibg=#67060c
 hi DiffChange       guifg=#ffdfb6 guibg=#5a1e02
 hi DiffText         guifg=#e6edf3 guibg=#5a1e02
+
+
+" :hi link A B      " Forces group A to look like group B. If A already had styles, they are overwritten.
+" :hi def link A B  " Links group A to B only if A has no styling applied yet
+" :hi! link A B     " Clears any existing unique attributes from group A and forces it to link to B
+hi default link     Warning    DiffChange
 
 " LSP / Diagnostic
 hi DiagnosticError  guifg=#f85149
@@ -1871,4 +1879,84 @@ function! RgExit(job, status) abort
     echom "Error: target.filename is missing or empty"
     echom "Target content: " . string(target)
   endif
+endfunction
+
+
+" ==== Plugin Markdown Check list ====
+augroup PluginMarkdownCheckList
+  autocmd!
+  " sign define todo text=☐ texthl=WarningMsg
+  " sign define done text=☑ texthl=DiffAdd
+  sign define todo text=⚠️
+  sign define done text=✅
+
+  " 使切換時statusline的顯示可以正常, 不會是之前的留存
+  autocmd BufRead,BufWritePost *
+        \ let g:checklist_todo_count = 0 |
+        \ let g:checklist_done_count = 0
+
+  autocmd BufRead,BufWritePost *.md,*.txt call MarkChecklists()
+  " autocmd TextChanged,TextChangedI *.md,*.txt call MarkChecklists()  " 這可能有點吃效能
+
+  " nnoremap ]t :call NextTodo()<CR>
+  " nnoremap [t :call PrevTodo()<CR>
+  " Note: 可以先呼叫後，用 :@: 接上一個command, 接著可以用 @@ 來重複
+  autocmd FileType markdown,text   command! -buffer NextTodo call NextTodo()
+  autocmd FileType markdown,text   command! -buffer PrevTodo call PrevTodo()
+augroup END
+
+" 簡單 function 標記 checklist
+function! MarkChecklists()
+  let l:group = 'MarkdownCheckList'
+
+  " 全域變數儲存計數（用來顯示在 statusline）
+  let g:checklist_todo_count = 0
+  let g:checklist_done_count = 0
+
+  execute 'sign unplace * group=' . l:group . ' buffer=' . bufnr('')
+
+  " 以下可行，但沒辦法做計數
+  " " 掃描未完成  " Note: 加入silent!可以讓找不到時，也不會有訊息來呈現
+  " silent! g/^\s*-\s\[[^x]\]/exe "sign place 1 line=" . line(".") . " group=" . l:group  .  " name=todo"
+  " " 已完成
+  " silent! g/^\s*-\s\[x\]/exe "sign place 1 line=" . line(".") . " group=" . l:group ." name=done"
+
+  let l:lnum = 1
+  while l:lnum <= line('$')
+    let l:line = getline(l:lnum)
+
+    if l:line =~# '^\s*-\s\[[^xXvV]\]'   " 未完成
+      exe "sign place 1 line=" . l:lnum . " name=todo"
+      let g:checklist_todo_count += 1
+    elseif l:line =~# '^\s*-\s\[[xXvV]\]'   " 已完成
+      exe "sign place 1 line=" . l:lnum . " name=done"
+      let g:checklist_done_count += 1
+    endif
+
+    let l:lnum += 1
+  endwhile
+endfunction
+
+function! ChecklistStatus()
+  " 先檢查兩個變數是否存在，避免未定義錯誤
+  if !exists('g:checklist_todo_count') || !exists('g:checklist_done_count')
+    return ''
+  endif
+
+  if g:checklist_todo_count + g:checklist_done_count == 0
+    return ''
+  endif
+  return printf(' [check: 🔳 %d / ✅ %d]', g:checklist_todo_count, g:checklist_done_count)
+endfunction
+
+
+" ==================== 跳轉功能 ====================
+" 跳到下一個未完成項目
+function! NextTodo()
+  call search('^\s*-\s\[[^xXvV]\]', 'W')
+endfunction
+
+" 跳到上一個未完成項目
+function! PrevTodo()
+  call search('^\s*-\s\[[^xXvV]\]', 'bW')
 endfunction
