@@ -657,8 +657,7 @@ augroup PluginBookmark
       echo "Bookmark not found: " . a:name
     endif
   endfunction
-  " bk方便呼叫
-  nnoremap bk :GotoBookmark
+  nnoremap <leader>bk :GotoBookmark
 
   " 補全功能
   function! BookmarkComplete(A, L, P)
