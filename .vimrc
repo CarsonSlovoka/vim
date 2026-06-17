@@ -1299,6 +1299,7 @@ augroup END
 augroup PluginMarkdownPreview
   autocmd!
   autocmd FileType markdown call MarkdownSetup()
+  "autocmd FileType markdown call GenerateMarkdownTOC() " 要用到的時候在自動建會比較好
 
   function! MarkdownSetup()
     " 摺疊 Markdown 標題
@@ -1368,6 +1369,12 @@ augroup PluginMarkdownPreview
 
     " Tab 展開/收合標題
     nnoremap <buffer> <Tab> za
+  endfunction
+
+  autocmd FileType markdown command! -buffer MdTOC call GenerateMarkdownTOC()
+  function! GenerateMarkdownTOC()
+    silent! execute 'lvimgrep /^#\+\s\+/ %'
+    lopen
   endfunction
 augroup END
 
