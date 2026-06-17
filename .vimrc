@@ -316,6 +316,37 @@ tnoremap <C-r> <C-w>"
 " tnoremap <Leader><Leader>c <C-\><C-n>iclear<CR> " 同下 (往上滾還是會看到)
 tnoremap <Leader>c <C-\><C-n>i<C-l>
 
+" 🟧 digraphs
+augroup Digraphs
+  " 😑
+  digraph -- 128529
+  " 😵
+  digraph xd 128565
+
+  " 😀 😁
+  digraph sm 128512 ha 128513
+
+  " 💬
+  digraph .. 128172
+
+  " ✅
+  digraph Ok 9989")
+
+  " ❌
+  digraph xx 10060"
+  " 👈 👇 👆 👉
+  digraph hh 128072 jj 128071 kk 128070 ll 128073
+
+  " 🚀
+  digraph rt 128640
+
+  " 💪
+  digraph sg 128170
+
+  " ≈ ≒
+  digraph ~~ 8776
+  digraph := 8776
+augroup END
 
 " 🟧 command
 function! Inspect()
