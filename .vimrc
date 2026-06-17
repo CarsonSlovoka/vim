@@ -1,3 +1,7 @@
+" if has("syntax") " vi --version | grep syntax " 要是+syntax才能用
+" syntax on
+" endif
+
 " 顯示列號
 set nu
 
