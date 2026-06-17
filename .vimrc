@@ -752,6 +752,7 @@ augroup PluginBookmark
   "set viminfo+=!  " 👈 沒用，還是沒辦法保存
 
   " 儲存書籤
+  command! BkSave call SaveBookmarks()
   function! SaveBookmarks()
     let l:dir = fnamemodify(g:bookmarks_file, ':h')
     if !isdirectory(l:dir)
