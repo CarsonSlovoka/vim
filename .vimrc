@@ -1142,9 +1142,9 @@ augroup PluginGit
   sign define GitDelete text=- texthl=DiffDelete
 
   function! UpdateGitSigns()
-    " 1. 取得當前 buffer 的編號與路徑
+  " 1. 取得當前 buffer 的編號與路徑
     let l:buf = bufnr('')
-    let l:file = expand('%')
+    let l:file = expand('%:p')
 
     " 若檔案不存在於磁碟上或為空，則跳過
     if empty(l:file) || !filereadable(l:file)
@@ -1154,48 +1154,53 @@ augroup PluginGit
     " 先強制清除本 buffer 所有 signs (避免使用 :e 還有舊的殘留)
     execute 'sign unplace * buffer=' . l:buf
 
-    " Get unified diff with 0 context
-    let l:diff = system('git --no-pager diff -U0 --relative -- ' . shellescape(l:file))
+    let l:diff = system('git --no-pager diff --no-color -U0 --relative -- ' . shellescape(l:file))
     if v:shell_error || empty(l:diff)
-        return
+      return
     endif
 
     let l:lines = split(l:diff, '\n')
     let l:id = 1
     let l:current_line = 0
+    let l:prev_was_delete = 0
 
     for l:line in l:lines
-      " Parse hunk header: @@ -old_start,old_count +new_start,new_count @@
       if l:line =~ '^@@'
+        " Parse hunk header: @@ -old_start,old_count +new_start,new_count @@
         let l:parts = matchlist(l:line, '^@@ -\d\+,\?\d* +\(\d\+\),\?\(\d*\) @@')
         if len(l:parts) >= 2
-          let l:new_start = str2nr(l:parts[1])
-          let l:count = str2nr(get(l:parts, 2, 1))
-          let l:current_line = l:new_start
+          let l:current_line = str2nr(l:parts[1])
+          let l:prev_was_delete = 0
         endif
         continue
       endif
 
-      " Process lines inside the hunk
       if l:line =~ '^[ +]'
-        if l:current_line > 0
-          if l:line[0] == '+'
-            " Added line
-            execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitAdd buffer=' . l:buf
+        if l:line[0] == '+'
+          " Added line
+          if l:prev_was_delete
+            " 前一行是 delete → 這是 modified
+            " TODO: 目前有的會重複，導致出現sign的問題，目前先用silent!忽略錯誤
+            silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
           else
-            " Changed line (context or modified)
-            execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
+            silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitAdd buffer=' . l:buf
           endif
-          let l:id += 1
+          let l:prev_was_delete = 0
+        else
+          " Context line (正常不會太多，因為 -U0)
+          silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
+          let l:prev_was_delete = 0
         endif
+        let l:id += 1
         let l:current_line += 1
+
       elseif l:line =~ '^-'
-        " Deletion - place delete sign on the next line (common behavior)
-        if l:current_line > 0
-          execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitDelete buffer=' . l:buf
+        " Deletion
+        if !l:prev_was_delete
+          silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitDelete buffer=' . l:buf
           let l:id += 1
         endif
-        " Do not increment current_line for deletions
+        let l:prev_was_delete = 1
       endif
     endfor
   endfunction
