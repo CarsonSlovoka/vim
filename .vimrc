@@ -275,6 +275,14 @@ vnoremap <leader>[ <Esc>`>a]<Esc>`<i[<Esc>
 nnoremap <leader>{ viw<Esc>`>a}<Esc>`<i{<Esc>
 vnoremap <leader>{ <Esc>`>a}<Esc>`<i{<Esc>
 
+" 將選取區塊下(J)/上(K)移一行
+" Note:
+" gv 重新選取
+" = 自動縮排
+" gv 再重新選取
+vnoremap J :m '>+1<CR>gv=gv
+vnoremap K :m '<-2<CR>gv=gv
+
 
 " Tip: terminal中可以用 <C-w>" 後面可以接暫存器的名稱，就可以貼上該內容
 tnoremap <C-r> <C-w>"
