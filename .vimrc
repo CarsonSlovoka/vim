@@ -1394,13 +1394,34 @@ function! MarkdownConceal()
   syntax match MdLinkClose '\](.\{-})' conceal contained
 
 
+  " 👇 這很重要，如果conceal有用空白，它就有可能會吃到背景色, 因為可以將Conceal的顏色都關掉
+  hi Conceal ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NONE
+
+  " 可行，但是cchar只能一個碼點，要多個需要用以下的方法
+  "syntax match MdH1Mark '^# '      conceal contained cchar=󰲡
+  "syntax match MdH2Mark '^## '     conceal contained cchar=󰲣
+  "syntax match MdH3Mark '^### '    conceal contained cchar=󰲥
+  "syntax match MdH4Mark '^#### '   conceal contained cchar=󰲧
+  "syntax match MdH5Mark '^##### '  conceal contained cchar=󰲩
+  "syntax match MdH6Mark '^###### ' conceal contained cchar=󰲫
+
   " Header Mark (Important: 當一個syntax可能也會有其它的syntax相衝，要用contains才會有多個效果)
-  syntax match MdH1Mark '^# '      conceal contained cchar=󰲡
-  syntax match MdH2Mark '^## '     conceal contained cchar=󰲣
-  syntax match MdH3Mark '^### '    conceal contained cchar=󰲥
-  syntax match MdH4Mark '^#### '   conceal contained cchar=󰲧
-  syntax match MdH5Mark '^##### '  conceal contained cchar=󰲩
-  syntax match MdH6Mark '^###### ' conceal contained cchar=󰲫
+  syntax match MdH1Head contained "#" conceal cchar=󰲡
+  "syntax match MdHeadingTail contained ' ' conceal cchar=    " 可行，但是最後面的空白打不出來(假設結尾空白會自動去除), 所以用exectue來輔助
+  execute printf("syntax match MdHeadingTail contained ' ' " . "conceal cchar= ")
+  syntax match MdH1Mark '^# '      contains=MdH1Head,MdHeadingTail
+
+  syntax match MdH2Head contained "##"     conceal cchar=󰲣
+  syntax match MdH3Head contained "###"    conceal cchar=󰲥
+  syntax match MdH4Head contained "####"   conceal cchar=󰲧
+  syntax match MdH5Head contained "#####"  conceal cchar=󰲩
+  syntax match MdH6Head contained "######" conceal cchar=󰲫
+
+  syntax match MdH2Mark '^## '     contains=MdH2Head,MdHeadingTail
+  syntax match MdH3Mark '^### '    contains=MdH3Head,MdHeadingTail
+  syntax match MdH4Mark '^#### '   contains=MdH4Head,MdHeadingTail
+  syntax match MdH5Mark '^##### '  contains=MdH5Head,MdHeadingTail
+  syntax match MdH6Mark '^###### ' contains=MdH6Head,MdHeadingTail
 
 endfunction
 
