@@ -1304,6 +1304,7 @@ augroup PluginMarkdownPreview
     " 摺疊 Markdown 標題
     setlocal foldmethod=expr
     setlocal foldexpr=MarkdownFold(v:lnum)
+    normal! zR
   endfunction
 
   function! MarkdownFold(lnum)
@@ -1385,14 +1386,42 @@ function! MarkdownConceal()
   syntax match MdTodoDone '\[x\]' conceal cchar=✅
   syntax match MdTodoDone '\[X\]' conceal cchar=✅
 
-  " LINK
-  "syntax match MdLink /\[[^]]*\](.\{-})/ conceal cchar=🌐  " 這樣會連網址加內容都變成🌐
+  "" Link & Image
+  ""syntax match MdLink /\[[^]]*\](.\{-})/ conceal cchar=🌐  " 這樣會連網址加內容都變成🌐
+  "
+  " 以下的方式各別跑可行，但是合在一起，image就會受到連結的影響而被取代
+  "syntax region MdLink
+  "    \ start='\['
+  "    \ end=')'
+  "    \ contains=MdLinkOpen,MdLinkClose
+  "syntax match MdLinkOpen '\[' conceal cchar=🌐 contained
+  "syntax match MdLinkClose '\](.\{-})' conceal contained
+  "
+  "syntax region MdImage
+  "    \ start='\!'
+  "    \ end=')'
+  "    \ contains=MdImageOpen,MdLinkClose
+  "syntax match MdImageOpen '!\[' conceal cchar=🖼️ contained
+
+  " 使用 \@<! 來表示「前面不是 !」的零寬斷言 (Negative Lookbehind), 使得連結要符合前面非`!` 使得image不會受到影響
   syntax region MdLink
-      \ start='\['
-      \ end=')'
-      \ contains=MdLinkOpen,MdLinkClose
-  syntax match MdLinkOpen '\[' conceal cchar=🌐 contained
+        \ start='\%(!\)\@<!\['
+        \ end=')'
+        \ contains=MdLinkOpen,MdLinkClose
+        \ keepend
+
+  syntax match MdLinkOpen '\%(!\)\@<!\[' conceal cchar=🌐 contained
   syntax match MdLinkClose '\](.\{-})' conceal contained
+
+  " 圖片的定義保持原樣，因為它明確指定了以 ! 開頭
+  syntax region MdImage
+        \ start='!'
+        \ end=')'
+        \ contains=MdImageOpen,MdLinkClose
+        \ keepend
+  "syntax match MdImageOpen '!\[' conceal cchar=🖼️ contained   " Warn: 🖼️ 這個有兩個unicode碼點組成，所以cchar取代能用，但是會不全
+  " 🌇 🌅
+  syntax match MdImageOpen '!\[' conceal cchar=🌇 contained
 
 
   " 👇 這很重要，如果conceal有用空白，它就有可能會吃到背景色, 因為可以將Conceal的顏色都關掉
