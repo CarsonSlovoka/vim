@@ -1038,3 +1038,47 @@ augroup PluginCopyPath
   xnoremap <silent> <leader>Y :<C-U>call <SID>CopyPathMenu()<CR>
 
 augroup END
+
+augroup PluginLazygit
+  function! OpenLazygit()
+    " 1. 檢查是否安裝 lazygit
+    if !executable('lazygit')
+      echohl WarningMsg
+      echo "lazygit not found. Please install it."
+      echohl None
+      return
+    endif
+
+    execute 'lcd' fnameescape(expand('%:p:h'))
+
+    " 2. 獲取 Git 根目錄
+    let l:git_root = system('git rev-parse --show-toplevel 2>/dev/null')
+    let l:git_root = substitute(l:git_root, '\n$', '', '')
+
+    if v:shell_error != 0
+      echoerr "Not in a Git repository"
+      return
+    endif
+
+    " 3. 切換目錄並打開新的 tab
+    execute 'lcd ' . fnameescape(l:git_root)
+    tabnew
+
+    " 4. 設置 Terminal
+    setlocal buftype=nofile
+    " term " 這個在vi會分開一個新的視窗, 用++curwin可以直接在當前的win開啟
+    :term ++curwin
+
+    " 5. 設定標題
+    let l:git_dirname = fnamemodify(l:git_root, ':t')
+    execute 'file git:' . l:git_dirname
+
+    " 6. 執行 lazygit
+    " 在 Vim 中，term 打開後預設會處於 Terminal-Job 模式
+    " 使用 feedkeys 來確保進入插入模式並執行指令
+    " call feedkeys("i" . "lazygit --screen-mode half" . "\<CR>") " vi 進入 term 就會自動是i的模式
+    call feedkeys("lazygit --screen-mode half" . "\<CR>")
+  endfunction
+
+  nnoremap <leader>git :call OpenLazygit()<CR>
+augroup END
