@@ -1094,6 +1094,7 @@ nnoremap <silent> <leader>st :call GitStatusQuickfix()<CR>
 
 augroup PluginGit
   autocmd!
+
   function! GitStatusQuickfix()
     execute 'lcd' fnameescape(expand('%:p:h'))
 
@@ -1126,4 +1127,51 @@ augroup PluginGit
     lopen
     lfirst
   endfunction
+
+
+  function! GitGutterJump(direction)
+    " 執行 git diff 獲取異動行號 (Warn: 要用--no-pager, 避免有的是用gitdelta可能是不同的主題，輸出會抓不到)
+    " 到grep '^@@的結果可能如下
+    " @@ -1096,0 +1097 @@ augroup PluginGit
+    " @@ -1128,0 +1130,45 @@ augroup PluginGit
+    " 使用 awk 取出 @@ 行中，空格後面第二個欄位 (即 +1097, +1130 等) (分隔符空白)
+    " 1097
+    " 1130,45
+    " 然後再用 sed 把 + 號去掉，只留下數字
+    let l:cmd = "git diff -U0 --relative | grep '^@@' | awk '{print $3}' | sed 's/+//'"
+
+    let l:lines = split(system(l:cmd), '\n')
+
+    if empty(l:lines)
+      echo "No git changes found."
+      return
+    endif
+
+    let l:curr = line('.')
+    let l:target = 0
+
+    if a:direction == 'next'
+      for l:ln in l:lines
+        if str2nr(l:ln) > l:curr
+          let l:target = str2nr(l:ln)
+          break
+        endif
+      endfor
+    else " prev
+      for l:ln in reverse(l:lines)
+        if str2nr(l:ln) < l:curr
+          let l:target = str2nr(l:ln)
+          break
+        endif
+      endfor
+    endif
+
+    if l:target != 0
+      execute 'normal! ' . l:target . 'G'
+    else
+      echo "No more changes in this direction."
+    endif
+  endfunction
+  nnoremap ]c :call GitGutterJump('next')<CR>
+  nnoremap [c :call GitGutterJump('prev')<CR>
 augroup END
