@@ -1372,8 +1372,23 @@ augroup PluginMarkdownPreview
   endfunction
 
   autocmd FileType markdown command! -buffer MdTOC call GenerateMarkdownTOC()
+  "function! GenerateMarkdownTOC()
+  "  silent! execute 'lvimgrep /^#\+\s\+/ %'
+  "  lopen
+  "endfunction
+
   function! GenerateMarkdownTOC()
-    silent! execute 'lvimgrep /^#\+\s\+/ %'
+    let lines = getline(1, '$')
+    let toc = []
+    let in_code = 0
+    for i in range(len(lines))
+      if lines[i] =~ '^\s*```'
+        let in_code = !in_code
+      elseif !in_code && lines[i] =~ '^#\+\s\+'
+        call add(toc, {'bufnr': bufnr('%'), 'lnum': i + 1, 'text': lines[i]})
+      endif
+    endfor
+    call setloclist(0, toc)
     lopen
   endfunction
 augroup END
