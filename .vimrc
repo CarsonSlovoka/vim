@@ -644,7 +644,7 @@ augroup PluginBookmark
       let [file, pos] = g:bookmarks[a:name]
       exec 'edit ' . file
       call setpos('.', pos)
-      echo "Jumped to: " . a:name
+      "echo "Jumped to: " . a:name  " 如果加了會需要按下確認，會多一個動作
     else
       echo "Bookmark not found: " . a:name
     endif
