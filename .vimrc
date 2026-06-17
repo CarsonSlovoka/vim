@@ -1505,7 +1505,8 @@ augroup MarkdownHighlight
 
     hi default MdCodeBlock ctermbg=236 guibg=#37365c
 
-    syntax match MdInlineMark '`' conceal
+    "syntax match MdInlineMark '`' conceal  " Important: 當沒有設定contained時, 它就會都能套用，當設定了contained，就只有用到contains此項目的內容才會套用
+    syntax match MdInlineMark '`' conceal contained
     "syntax match MdInlineCode /`[^`]\+`/  " 可行，但是頭尾的`都還看的到
     syntax match MdInlineCode /`[^`]\+`/ contains=MdInlineMark
     hi default MdInlineCode ctermfg=220 guifg=#f1fa8c
