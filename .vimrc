@@ -54,6 +54,14 @@ set list  " 這也要加上 listchars 才會有用
 
 set shortmess-=S  " 這個在搜尋的時候，可以出現匹配的個數
 
+" 🟧 cursorshape
+" 切換為插入模式 (Insert Mode) 時改為直線游標
+let &t_SI = "\<Esc>[6 q"
+" 切換為一般模式 (Normal Mode) 時改為方塊游標
+let &t_EI = "\<Esc>[2 q"
+" 切換為取代模式 (Replace Mode) 時改為底線游標
+let &t_SR = "\<Esc>[4 q"
+
 " 🟧 tabline
 set tabline=%!MyTabLine()
 function! MyTabLine()
