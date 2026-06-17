@@ -1377,6 +1377,7 @@ augroup MarkdownConceal
 augroup END
 
 function! MarkdownConceal()
+  " Note: conceallevel=2 會自動做 bold, italic
   setlocal conceallevel=2
 
   " Checkbox
@@ -1475,8 +1476,9 @@ augroup MarkdownHighlight
 
     hi default MdCodeBlock ctermbg=236 guibg=#37365c
 
-    " Inline code
-    syntax match MdInlineCode /`[^`]\+`/
+    syntax match MdInlineMark '`' conceal
+    "syntax match MdInlineCode /`[^`]\+`/  " 可行，但是頭尾的`都還看的到
+    syntax match MdInlineCode /`[^`]\+`/ contains=MdInlineMark
     hi default MdInlineCode ctermfg=220 guifg=#f1fa8c
 
   endfunction
