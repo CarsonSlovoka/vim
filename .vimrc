@@ -677,6 +677,10 @@ augroup PluginBookmark
 
   " 儲存書籤
   function! SaveBookmarks()
+    let l:dir = fnamemodify(g:bookmarks_file, ':h')
+    if !isdirectory(l:dir)
+        call mkdir(l:dir, 'p')
+    endif
     call writefile([json_encode(g:bookmarks)], g:bookmarks_file)
   endfunction
 
