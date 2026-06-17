@@ -1151,8 +1151,10 @@ augroup PluginGit
       return
     endif
 
+    let l:group = 'GitSigns'
     " 先強制清除本 buffer 所有 signs (避免使用 :e 還有舊的殘留)
-    execute 'sign unplace * buffer=' . l:buf
+    " execute 'sign unplace * buffer=' . l:buf  " Warn不推清全部的，最好建一個group, 清除該group就好
+    execute 'sign unplace * group=' . l:group . ' buffer=' . l:buf
 
     let l:diff = system('git --no-pager diff --no-color -U0 --relative -- ' . shellescape(l:file))
     if v:shell_error || empty(l:diff)
@@ -1160,7 +1162,11 @@ augroup PluginGit
     endif
 
     let l:lines = split(l:diff, '\n')
-    let l:id = 1
+    "let l:id = 1
+    let l:id = 10000000 + l:buf * 100000 " 每個buffer擁有自己的id
+    "buffer 1 -> 1000000~1099999
+    "buffer 2 -> 1100000~1199999
+    "buffer 3 -> 1200000~1299999
     let l:current_line = 0
     let l:prev_was_delete = 0
 
@@ -1180,15 +1186,18 @@ augroup PluginGit
           " Added line
           if l:prev_was_delete
             " 前一行是 delete → 這是 modified
-            " TODO: 目前有的會重複，導致出現sign的問題，目前先用silent!忽略錯誤
-            silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
+            " TODO: 目前有的會重複，導致出現sign的問題: `E885: Not possible to change sign GitAdd` 目前先用silent!忽略錯誤
+            execute printf('silent! sign place %d group=%s line=%d name=GitChange buffer=%d',
+              \ l:id, l:group, l:current_line, l:buf)
           else
-            silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitAdd buffer=' . l:buf
+            execute printf('silent! sign place %d group=%s line=%d name=GitAdd buffer=%d',
+              \ l:id, l:group, l:current_line, l:buf)
           endif
           let l:prev_was_delete = 0
         else
           " Context line (正常不會太多，因為 -U0)
-          silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitChange buffer=' . l:buf
+          execute printf('silent! sign place %d group=%s line=%d name=GitChange buffer=%d',
+            \ l:id, l:group, l:current_line, l:buf)
           let l:prev_was_delete = 0
         endif
         let l:id += 1
@@ -1197,7 +1206,8 @@ augroup PluginGit
       elseif l:line =~ '^-'
         " Deletion
         if !l:prev_was_delete
-          silent! execute 'sign place ' . l:id . ' line=' . l:current_line . ' name=GitDelete buffer=' . l:buf
+          execute printf('silent! sign place %d group=%s line=%d name=GitDelete buffer=%d',
+            \ l:id, l:group, l:current_line, l:buf)
           let l:id += 1
         endif
         let l:prev_was_delete = 1
