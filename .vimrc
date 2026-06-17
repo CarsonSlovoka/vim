@@ -675,3 +675,97 @@ augroup PluginBookmark
   autocmd VimLeave * call SaveBookmarks()
 augroup END
 
+augroup PluginHighlightSpecial
+  autocmd!
+
+  " 保存目前所有 match id
+  let s:match_ids = []
+
+  function! HighlightSpecialKeywords() abort
+    "--------------------------------------------------
+    " 清除舊的 match
+    "--------------------------------------------------
+    for id in s:match_ids
+      silent! call matchdelete(id)
+    endfor
+    let s:match_ids = []
+
+    "--------------------------------------------------
+    " 全形空格 U+3000
+    "--------------------------------------------------
+    highlight CJKFullWidthSpace
+          \ guifg=#00ffff
+          \ guibg=#a6a6a6
+          \ ctermfg=cyan
+          \ ctermbg=gray
+
+    call add(s:match_ids,
+          \ matchadd('CJKFullWidthSpace', '　'))
+
+    "--------------------------------------------------
+    " 關鍵字
+    "--------------------------------------------------
+    let highlights = [
+          \ ['NOTE',       '#FFFFFF', '#0000FF', '\<N[Oo][Tt][Ee]\>:\?'],
+          \ ['USAGE',      '#FFFFFF', '#179797', '\<U[Ss][Aa][Gg][Ee]\>:\?'],
+          \ ['TODO',       '#000000', '#8bb33d', '\<T[Oo][Dd][Oo]\>:\?'],
+          \ ['WARNING',    '#020505', '#FFA500', '\<W[Aa][Rr][Nn]\(ing\)\?\>:\?'],
+          \ ['FIXME',      '#F8F6F4', '#EA6890', '\<F[Ii][Xx][Mm][Ee]\>:\?'],
+          \ ['TIP',        '#323225', '#99CC00', '\<T[Ii][Pp]\(s\)\?\>:\?'],
+          \ ['IMPORTANT',  '#F1F2E6', '#FF00FF', '\<I[Mm][Pp][Oo][Rr][Tt][Aa][Nn][Tt]\>:\?'],
+          \ ['ERROR',      '#F1F2E6', '#FF0000', '\<E[Rr][Rr]\(or\)\?\>:\?'],
+          \ ['CAUTION',    '#F1F2E6', '#FF0000', '\<C[Aa][Uu][Tt][Ii][Oo][Nn]\>:\?'],
+          \ ['DEPRECATED', '#FFFFFF', '#696969', '\<D[Ee][Pp][Rr][Ee][Cc][Aa][Tt][Ee][Dd]\>'],
+          \ ]
+
+    for hl in highlights
+      let name = hl[0]
+      let fg   = hl[1]
+      let bg   = hl[2]
+      let pat  = hl[3]
+
+      execute printf(
+            \ 'highlight %s guifg=%s guibg=%s ctermfg=white ctermbg=darkgray',
+            \ name, fg, bg)
+
+      call add(s:match_ids,
+            \ matchadd(name, pat))
+    endfor
+
+    "--------------------------------------------------
+    " ~~刪除線~~
+    "--------------------------------------------------
+    highlight STRIKETHROUGH
+          \ guifg=#8b949e
+          \ ctermfg=gray
+          \ gui=strikethrough
+          \ cterm=strikethrough
+
+    call add(s:match_ids,
+          \ matchadd(
+          \   'STRIKETHROUGH',
+          \   '\~\~.\{-\}\~\~'
+          \ ))
+
+    "--------------------------------------------------
+    " URL
+    "--------------------------------------------------
+    highlight HYPERLINK
+          \ guifg=#00c6ff
+          \ ctermfg=cyan
+          \ gui=underline
+          \ cterm=underline
+
+    call add(s:match_ids,
+          \ matchadd(
+          \   'HYPERLINK',
+          \   '\<https\?:\/\/[a-zA-Z0-9#?./=_%:-]*\>'
+          \ ))
+  endfunction
+
+  autocmd BufReadPost,BufNewFile * call HighlightSpecialKeywords()
+
+  " 如果 colorscheme 改變，重新套用
+  autocmd ColorScheme * call HighlightSpecialKeywords()
+
+augroup END
