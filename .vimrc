@@ -473,6 +473,21 @@ command! Inspect call Inspect()
 
 command! NewTmp enew | setlocal buftype=nofile noswapfile
 
+augroup Formatting
+  autocmd!
+
+  "可行，但是所有的buffer都可以用
+  "command! FmtJson %!jq .
+  "command! -range FmtCurl s/ -/ \\\r -/g
+  " -buffer只有當前的該buffer才會有此指令能用
+  autocmd FileType json        command! -buffer FmtJson %!jq .
+  autocmd FileType sh,bash,zsh command! -buffer -range FmtCurl s/ -/ \\\r -/g
+
+  "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
+  autocmd FileType go command! -buffer FmtGo %!gofmt
+augroup END
+
+
 " 🟧 autocmd
 "augroup YankHighlight  " 在vi不能這樣用，沒有lua能用
 "  autocmd!
