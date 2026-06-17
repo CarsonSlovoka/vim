@@ -7,6 +7,9 @@ if has("syntax") " vi --version | grep syntax " 要是+syntax才能用
   "set foldmethod=syntax
 endif
 
+set fileencodings=ucs-bom,utf-8,default,cp950,big5,gbk,binary
+set fileformat=unix
+
 " 顯示列號
 " set nu
 set relativenumber
