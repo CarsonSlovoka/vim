@@ -482,12 +482,41 @@ augroup Formatting
   "command! FmtJson %!jq .
   "command! -range FmtCurl s/ -/ \\\r -/g
   " -buffer只有當前的該buffer才會有此指令能用
-  autocmd FileType json        command! -buffer FmtJson %!jq .
-  autocmd FileType sh,bash,zsh command! -buffer -range FmtCurl s/ -/ \\\r -/g
+  autocmd FileType json        command! -buffer        FmtJson   %!jq .
+  autocmd FileType sh,bash,zsh command! -buffer -range FmtCurl   s/ -/ \\\r -/g
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
-  autocmd FileType go          command! -buffer FmtGo  %!gofmt
-  autocmd FileType xml         command! -buffer FmtXml %!xmlstarlet fo
+  autocmd FileType go          command! -buffer        FmtGo     %!gofmt
+
+  autocmd FileType xml         command! -buffer        FmtXml    %!xmlstarlet fo
+
+  "autocmd FileType rust       command! -buffer        FmtRs
+  "    \ update | silent %!cargo fmt
+  autocmd FileType rust        command! -buffer        FmtRs     call FmtRust()
+  function! FmtRust() abort
+    update
+
+    " 使用 rustfmt --emit=stdout 來 filter
+    let l:cmd = 'rustfmt --emit=stdout'
+    " 好像也能用以下的方式(沒試過)
+    " let l:cmd = 'cargo fmt -- --emit=stdout'
+
+    let l:output = system(l:cmd, join(getline(1, '$'), "\n"))
+
+    if v:shell_error != 0
+      " 錯誤時只顯示訊息，不修改 buffer
+      echo "cargo fmt / rustfmt 執行失敗！"
+      echomsg "❌ Error："
+      for line in split(l:output, "\n")
+          echomsg line
+      endfor
+      return
+    endif
+
+    " 成功才替換 buffer
+    %delete _
+    call setline(1, split(l:output, "\n"))
+  endfunction
 augroup END
 
 
