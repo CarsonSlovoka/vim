@@ -1414,11 +1414,11 @@ augroup PluginGit
   autocmd BufReadPost,BufWritePost,CursorHold,CursorHoldI,BufEnter * call UpdateGitSigns()
 
   function! GitGutterJump(direction)
-    if &diff
-      " 在diff模式下直接執行原生命令。詳: `:help diff` 再搜尋: &diff
-      execute 'normal! ' . (a:direction == 'next' ? ']c' : '[c')
-      return
-    endif
+    " if &diff
+    "   " 在diff模式下直接執行原生命令。詳: `:help diff` 再搜尋: &diff
+    "   execute 'normal! ' . (a:direction == 'next' ? ']c' : '[c')
+    "   return
+    " endif
 
     execute 'lcd' fnameescape(expand('%:p:h'))
 
@@ -1465,8 +1465,11 @@ augroup PluginGit
       echo "No more changes in this direction."
     endif
   endfunction
-  nnoremap ]c :call GitGutterJump('next')<CR>
-  nnoremap [c :call GitGutterJump('prev')<CR>
+  " nnoremap ]c :call GitGutterJump('next')<CR>
+  " nnoremap [c :call GitGutterJump('prev')<CR>
+  " 用以下的方式更好, 就不需要將&diff的判斷寫在 GitGutterJump 之中
+  nnoremap <expr> ]c &diff ? ']c' : ':call GitGutterJump("next")<CR>'
+  nnoremap <expr> [c &diff ? '[c' : ':call GitGutterJump("prev")<CR>'
 augroup END
 
 " ============================================================
