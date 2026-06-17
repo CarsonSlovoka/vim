@@ -731,7 +731,7 @@ augroup PluginBookmark
   call LoadBookmarks()
 
   " 設定書籤 (:BkAdd Foo)
-  command! -nargs=1 BkAdd call SetBookmark(<q-args>)
+  command! -nargs=1 -complete=customlist,BookmarkComplete BkAdd call SetBookmark(<q-args>)
   function! SetBookmark(name)
     let g:bookmarks[a:name] = [expand('%:p'), getpos('.')]
     echo "Bookmarked: " . a:name
