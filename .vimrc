@@ -105,7 +105,8 @@ set statusline+=%w                      " Preview window flag [Preview]
 set statusline+=%=
 
 " 5. Build the right side of the statusline
-set statusline+=%{indent('.')}
+set statusline+=%{indent('.')/&tabstop} " indent('.') 是當前列的縮進是幾個空白. 可以曉得要一口氣縮進多少. 可以直接除上tabstop就會曉得要縮進幾個
+set statusline+=\ TS:%{&tabstop}
 set statusline+=\ %{\ &fileencoding\ !=\ ''\ ?\ &fileencoding\ :\ &encoding\ }
 set statusline+=\ [%{&fileformat}]      " File format/Line endings (e.g., [unix])
 set statusline+=\ [%Y]                    " File type (e.g., [PYTHON])
