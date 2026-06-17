@@ -1129,6 +1129,45 @@ augroup PluginGit
   endfunction
 
 
+
+  "" 定義符號樣式 (在行號欄位顯示)
+  hi SignColumn guibg=NONE ctermbg=NONE
+  hi DiffAdd ctermfg=Green ctermbg=NONE
+  hi DiffChange ctermfg=Yellow ctermbg=NONE
+  sign define GitAdd text=+ texthl=DiffAdd
+  sign define GitChange text=! texthl=DiffChange
+  sign define GitDelete text=- texthl=DiffDelete
+
+  function! UpdateGitSigns()
+      " 1. 取得當前 buffer 的編號與路徑
+      let l:buf = bufnr('')
+      let l:file = expand('%')
+
+      " 若檔案不存在於磁碟上或為空，則跳過
+      if empty(l:file) | return | endif
+
+      " 2. 清除該 buffer 所有已存在的標記
+      execute 'sign unplace * buffer=' . l:buf
+
+      " 3. 抓取當前檔案的異動行號
+      " 加入 '-- ' . l:file 限制只針對當前檔案進行 diff
+      let l:cmd = "git --no-pager diff -U0 --relative -- " . shellescape(l:file) . " | grep '^@@' | awk '{print $3}' | sed 's/+//'"
+      let l:lines = split(system(l:cmd), '\n')
+
+      " 4. 重新放置標記
+      let l:id = 1
+      for l:ln in l:lines
+          let l:line_num = str2nr(l:ln)
+          if l:line_num > 0
+              execute 'sign place ' . l:id . ' line=' . l:line_num . ' name=GitAdd buffer=' . l:buf
+              let l:id += 1
+          endif
+      endfor
+  endfunction
+
+  " 當存檔或進入緩衝區時自動更新
+  autocmd BufReadPost,BufWritePost,CursorHold,CursorHoldI,BufEnter * call UpdateGitSigns()
+
   function! GitGutterJump(direction)
     execute 'cd' fnameescape(expand('%:p:h'))
 
