@@ -239,6 +239,8 @@ hi DiagnosticHint   guifg=#8b949e
 " 🟧 keymap
 nnoremap Q :q<CR>
 
+vnoremap <leader>y "+y
+
 nnoremap <A-w> <C-w>w<CR>
 nnoremap <A-h> <C-w>h<CR>
 nnoremap <A-j> <C-w>j<CR>
