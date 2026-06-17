@@ -990,6 +990,82 @@ augroup PluginGitlist
   "command! Gitclist call s:GitLsFiles(v:false, {})
   "command! Gitllist call s:GitLsFiles(v:true, {})
 
+
+  command! -nargs=* Gitfiles call GitFiles(<f-args>)
+  " TODO: 當前還不能自動跳轉，要用gf才可以
+  function! GitFiles(...) abort
+    " 切換到目前檔案所在目錄
+    execute 'lcd' expand('%:p:h')
+
+    let git_root = substitute(
+          \ system('git rev-parse --show-toplevel'),
+          \ '\n$',
+          \ '',
+          \ '')
+
+    if v:shell_error != 0
+      echoerr 'Not in a Git repository'
+      return
+    endif
+
+    execute 'lcd' git_root
+
+    tabnew
+    setlocal buftype=nofile
+
+    let git_dirname = fnamemodify(git_root, ':t')
+    execute 'file search git files:' . git_dirname
+
+    if filereadable(expand('~/fzf/bin/fzf-preview.sh'))
+      let preview_cmd =
+            \ printf('--preview "%s {}"',
+            \ expand('~/fzf/bin/fzf-preview.sh'))
+    else
+      let preview_cmd =
+            \ '--preview "bat --color=always --style=numbers {}"'
+    endif
+
+    let cmd =
+          \ 'git ls-files --exclude-standard --cached | ' .
+          \ 'fzf --style full --multi ' .
+          \ preview_cmd . ' ' .
+          \ "--bind 'ctrl-q:select-all+accept'"
+
+    let s:gitfiles_buf = bufnr('%')
+
+    call term_start([&shell, &shellcmdflag, cmd], {
+          \ 'exit_cb': function('GitFilesExit'),
+          \ 'curwin': v:true,
+          \ })
+
+   startinsert
+  endfunction
+
+  function! GitFilesExit(job, status) abort
+    let lines = getbufline(s:gitfiles_buf, 1, '$')
+
+    call setqflist([], 'r')
+
+    for filepath in lines
+      if filereadable(filepath)
+        call setqflist([
+              \ {
+              \ 'filename': filepath,
+              \ 'text': filepath,
+              \ }
+              \ ], 'a')
+      endif
+    endfor
+
+    let files = filter(copy(lines), 'v:val != ""')
+
+    if !empty(files)
+      execute 'edit' fnameescape(files[0])
+    endif
+
+    execute 'bwipeout!' s:gitfiles_buf
+  endfunction
+
 augroup END
 
 
