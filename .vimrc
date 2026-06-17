@@ -513,6 +513,28 @@ command! Inspect call Inspect()
 
 command! NewTmp enew | setlocal buftype=nofile noswapfile
 
+command! -range -nargs=0 Help call s:HelpOnSelection()
+function! s:HelpOnSelection() range
+  " 取得 visual 選擇的文字. 這可行，但是gvy似乎會觸發其它的event, 導致執行了之後有其它的問題
+  "let save_reg = @@
+  "silent! normal! gvy
+  "let selected = @@
+  "let @@ = save_reg
+
+  " 取得選取內容
+  let selected = join(getregion(getpos("'<"), getpos("'>")), '')
+
+  " 清除前後空白
+  let selected = substitute(selected, '^\s*\|\s*$', '', 'g')
+
+  if empty(selected)
+   return
+  endif
+
+  execute 'help' selected
+endfunction
+
+
 augroup Formatting
   autocmd!
 
