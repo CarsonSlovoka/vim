@@ -516,7 +516,17 @@ endfunction
 " command! Inspect echo synIDattr(synID(line("."),col("."),1),"name")   " 👈 這可行，但比較簡單
 command! Inspect call Inspect()
 
-command! NewTmp enew | setlocal buftype=nofile noswapfile
+" command! NewTmp enew | setlocal buftype=nofile noswapfile
+command! -nargs=? -complete=filetype NewTmp call NewTmp(<q-args>)
+function! NewTmp(ft) abort
+  enew
+  setlocal buftype=nofile noswapfile
+
+  " 如果有提供 filetype，就設定
+  if !empty(a:ft)
+    execute 'setlocal filetype=' . a:ft
+  endif
+endfunction
 
 command! -range -nargs=0 Help call s:HelpOnSelection()
 function! s:HelpOnSelection() range
