@@ -1087,3 +1087,43 @@ augroup PluginLazygit
 
   nnoremap <leader>git :call OpenLazygit()<CR>
 augroup END
+
+
+" <leader>st : 顯示 git status 中的檔案到 quickfix list，並開啟 quickfix window
+nnoremap <silent> <leader>st :call GitStatusQuickfix()<CR>
+
+augroup PluginGit
+  autocmd!
+  function! GitStatusQuickfix()
+    execute 'lcd' fnameescape(expand('%:p:h'))
+
+    let l:output = system('git status -s')
+    if v:shell_error
+      echo "Not a git repository or git command error"
+      return
+    endif
+
+    let l:ll_list = []
+    for line in split(l:output, "\n")
+      let l:parts = split(line, '\s\+')
+      if len(l:parts) >= 2
+        let l:file = l:parts[-1] " 取最後一個欄位（檔案路徑）
+        " 過濾掉 deleted 等無法跳轉的檔案
+        "if l:file !~ '^\(D\|DD\)'
+        if l:file !~ '^D'
+          call add(l:ll_list, {'filename': l:file, 'text': line})
+        endif
+      endif
+    endfor
+
+    if empty(l:ll_list)
+      echo "沒有需要處理的檔案"
+      return
+    endif
+
+    "call setqflist(l:qf_list)
+    call setloclist(0, l:ll_list)
+    lopen
+    lfirst
+  endfunction
+augroup END
