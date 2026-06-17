@@ -612,6 +612,8 @@ autocmd BufWritePre * %s/\s\+$//e
 
 
 " 🟧 Plugin
+packadd cfilter
+
 augroup PluginBookmark
   " 存放書籤的字典
   let g:bookmarks = {}
