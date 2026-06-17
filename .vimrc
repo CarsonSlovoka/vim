@@ -22,7 +22,9 @@ set showcmd
 
 set showmatch
 
-set cursorline
+" set lazyredraw
+set synmaxcol=128     " vi對syntax的處理不如nvim, 所以減少會對速度提升很多
+set cursorline        " 在vi禁用這些對速度會提升很多: `:set nocursorline nocursorcolumn`  (但nvim沒什麼影響)
 set cursorcolumn
 
 " scrolloff=999 保持在畫面中間
@@ -139,8 +141,8 @@ set background=dark       " Important: 這個還是要選，它也會影響到hi
 " highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=white
  "highlight CursorLine   cterm=NONE ctermbg=DarkGray ctermfg=NONE " ctermfg 用None才不會影響到syntax的突顯
  "highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=NONE
-highlight CursorLine     cterm=NONE guibg=#333333  ctermfg=NONE
-highlight CursorColumn   cterm=NONE guibg=#2f3e54  ctermfg=NONE
+highlight CursorLine     cterm=NONE guibg=#2f3e54  ctermfg=NONE
+highlight CursorColumn   cterm=NONE guibg=#3a3a3a  ctermfg=NONE
 "set cursorlineopt=number,line  " 這是預設
 set cursorlineopt=line
 
