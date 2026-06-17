@@ -1384,6 +1384,16 @@ function! MarkdownConceal()
   syntax match MdTodoDone '\[x\]' conceal cchar=✅
   syntax match MdTodoDone '\[X\]' conceal cchar=✅
 
+  " LINK
+  "syntax match MdLink /\[[^]]*\](.\{-})/ conceal cchar=🌐  " 這樣會連網址加內容都變成🌐
+  syntax region MdLink
+      \ start='\['
+      \ end=')'
+      \ contains=MdLinkOpen,MdLinkClose
+  syntax match MdLinkOpen '\[' conceal cchar=🌐 contained
+  syntax match MdLinkClose '\](.\{-})' conceal contained
+
+
   " Header Mark
   "可用，但是顏色就會沒有了
   "syntax match MdH1Mark '^# ' conceal
