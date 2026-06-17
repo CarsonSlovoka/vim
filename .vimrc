@@ -1422,7 +1422,7 @@ function! MarkdownConceal()
 
   " 使用 \@<! 來表示「前面不是 !」的零寬斷言 (Negative Lookbehind), 使得連結要符合前面非`!` 使得image不會受到影響
   syntax region MdLink
-        \ start='\%(!\)\@<!\['
+        \ start='\%(!\)\@<!\[.*]('
         \ end=')'
         \ contains=MdLinkOpen,MdLinkClose
         \ keepend
