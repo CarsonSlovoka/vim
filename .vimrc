@@ -98,6 +98,8 @@ hi StatusLineTermNC ctermbg=NONE     cterm=NONE
  "highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=NONE
 highlight CursorLine     cterm=NONE guibg=#333333  ctermfg=NONE
 highlight CursorColumn   cterm=NONE guibg=#2f3e54  ctermfg=NONE
+"set cursorlineopt=number,line  " 這是預設
+set cursorlineopt=line
 
 highlight IncSearch guifg=#161b22 guibg=#f0883e
 highlight Visual    guifg=#ffffff guibg=#78120d
