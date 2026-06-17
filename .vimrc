@@ -50,6 +50,8 @@ endfor
 set listchars=tab:\|\ ,trail:·,multispace:\ ,nbsp:␣  " https://github.com/CarsonSlovoka/nvim/blob/f0eb3965cd3f0dd63e962ce256477a308f4c71a6/lua/config/options.lua#L190-L205
 set list  " 這也要加上 listchars 才會有用
 
+set shortmess-=S  " 這個在搜尋的時候，可以出現匹配的個數
+
 " 🟧 tabline
 set tabline=%!MyTabLine()
 function! MyTabLine()
@@ -105,6 +107,8 @@ set statusline+=%h                      " Help buffer flag [help]
 set statusline+=%w                      " Preview window flag [Preview]
 
 " 4. Divider: everything after this character moves to the right side
+" set statusline+=%=
+" set statusline+=\ %{searchcount().current}/%{searchcount().total}  " 好處是離開search時還能看到, 甚致曉得到當前第幾個, 但不用的時候就很礙眼
 set statusline+=%=
 
 " 5. Build the right side of the statusline
