@@ -140,8 +140,32 @@ set statusline+=\ %l:%c                 " Current {line, column} number
 
 if exists('+termguicolors')
   set termguicolors    " 這如果沒有設定，有的顏色看起來不好看
+  set t_Co=256         " 預設就是256
 endif
 
+" 預設的版本: \x1b[34m 顏色會看不清楚，會太深
+" Note: 預設`g:terminal_ansi_colors`就是沒有定義的，所以要加只能全加
+let g:terminal_ansi_colors = [
+      \ '#282c34',
+      \ '#ca1c3d',
+      \ '#33df08',
+      \ '#ffe200',
+      \ '#00c6ff',
+      \ '#cf01d5',
+      \ '#3edcda',
+      \ '#abb2bf',
+      \ '#5c6370',
+      \ '#e06c75',
+      \ '#98c379',
+      \ '#e5c07b',
+      \ '#61afef',
+      \ '#c678dd',
+      \ '#56b6c2',
+      \ '#ffffff'
+      \ ]
+" blue:     #2200da #0068da #65aeff #61afef #00c6ff
+" cyan:     #56b6c2 #3edcda
+" purple:   #c678dd #cf01d5
 
 " 🟧 highlight
 " 預設的主題(colorscheme)顏色, 都不太好, 使用自定
