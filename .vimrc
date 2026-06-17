@@ -247,7 +247,9 @@ nnoremap <A-j> <C-w>j<CR>
 nnoremap <A-k> <C-w>k<CR>
 nnoremap <A-l> <C-w>l<CR>
 
-nnoremap <leader><leader>t :term<CR>
+" 在當前的目錄開啟term
+" nnoremap <leader><leader>t :term<CR>
+nnoremap <leader><leader>t :execute 'cd ' . expand('%:h') \| term<CR>
 
 nnoremap <A-t> :tabnew<CR>
 
