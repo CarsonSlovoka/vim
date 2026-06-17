@@ -428,6 +428,8 @@ endfunction
 " command! Inspect echo synIDattr(synID(line("."),col("."),1),"name")   " 👈 這可行，但比較簡單
 command! Inspect call Inspect()
 
+command! NewTmp enew | setlocal buftype=nofile noswapfile
+
 " 🟧 autocmd
 "augroup YankHighlight  " 在vi不能這樣用，沒有lua能用
 "  autocmd!
