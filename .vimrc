@@ -90,6 +90,9 @@ hi StatusLineTermNC ctermbg=NONE     cterm=NONE
 
 
 " 🟧 highlight
+set background=dark
+colorscheme wildcharm   " darkblue, habamax, slate, unokai, wildcharm " 能與CursorLine, CursorColumn匹配
+
 " :help hi
 " Warn: 是用NONE而不是None
 " highlight CursorLine   cterm=NONE ctermbg=DarkGray ctermfg=white
