@@ -251,6 +251,15 @@ nnoremap <A-t> :tabnew<CR>
 
 nnoremap <leader>/ :nohlsearch<CR>
 
+" link
+vnoremap <leader><leader>l c[<C-r>"]()<Left>
+
+" insert move
+inoremap <A-h> <Left>
+inoremap <A-j> <Down>
+inoremap <A-k> <Up>
+inoremap <A-l> <Left>
+
 
 " Wrap selection / word with double quotes
 nnoremap <leader>" viw<Esc>`>a"<Esc>`<i"<Esc>
