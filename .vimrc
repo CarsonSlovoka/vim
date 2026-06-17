@@ -298,6 +298,46 @@ tnoremap <C-r> <C-w>"
 tnoremap <Leader>c <C-\><C-n>i<C-l>
 
 
+" 🟧 command
+function! Inspect()
+  let l:pos = [line('.'), col('.')]
+  let l:synstack = synstack(l:pos[0], l:pos[1])
+
+  echo "=== Inspect at (" . l:pos[0] . "," . l:pos[1] . ") ==="
+
+  if empty(l:synstack)
+    echo "No syntax highlight found."
+    return
+  endif
+
+  echo "Syntax stack (from bottom to top):"
+  for id in l:synstack
+    let name = synIDattr(id, "name")
+    echo "  • " . name
+  endfor
+
+  " 最上層的 highlight group
+  let hi = synIDattr(synID(l:pos[0], l:pos[1], 1), "name")
+  echo "\nDirect highlight group: " . hi
+
+  " 最終連結到的 group
+  let lo = synIDattr(synIDtrans(synID(l:pos[0], l:pos[1], 1)), "name")
+  if hi != lo
+    echo "Links to: " . lo
+  endif
+
+  " 顯示 highlight 設定
+  if hlexists(hi)
+    redir => hl_output
+    silent execute 'highlight ' . hi
+    redir END
+    echo "\nHighlight definition:"
+    echo trim(hl_output)
+  endif
+endfunction
+" command! Inspect echo synIDattr(synID(line("."),col("."),1),"name")   " 👈 這可行，但比較簡單
+command! Inspect call Inspect()
+
 " 🟧 autocmd
 "augroup YankHighlight  " 在vi不能這樣用，沒有lua能用
 "  autocmd!
