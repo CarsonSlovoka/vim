@@ -925,3 +925,115 @@ augroup PluginGitlist
   command! -nargs=* -complete=customlist,s:GitListComplete Gitllist
          \ call s:GitListToList(v:true, <f-args>)
 augroup END
+
+
+" ==========================================================
+" Copy file path / git path / git show command
+" <leader>Y
+" ==========================================================
+augroup PluginCopyPath
+
+  function! s:CopyPathMenu() abort
+    let abs_path = expand('%:p')
+    let filename = expand('%:t')
+
+    let options = []
+    let labels  = []
+
+    " Absolute path
+    call add(options, abs_path)
+    call add(labels, 'Absolute Path: ' . abs_path)
+
+    " Filename
+    call add(options, filename)
+    call add(labels, 'Filename: ' . filename)
+
+    " --------------------------------------------------------
+    " git relative path
+    " --------------------------------------------------------
+
+    let git_show_paths = []
+
+    let cmd = 'git ls-files --full-name ' . shellescape(abs_path)
+    let result = systemlist(cmd)
+
+    if v:shell_error == 0 && !empty(result)
+      let git_rel_path = result[0]
+
+      call add(options, git_rel_path)
+      call add(labels, 'Git Relative Path: ' . git_rel_path)
+
+      " ------------------------------------------------------
+      " latest commit sha
+      " ------------------------------------------------------
+
+      let sha_cmd =
+            \ 'git log -n 1 --pretty=format:%H -- '
+            \ . shellescape(abs_path)
+
+      let sha_result = systemlist(sha_cmd)
+
+      if !empty(sha_result)
+        let sha = sha_result[0]
+
+        " visual mode line range
+        let start_line = line('v')
+        let end_line   = line('.')
+
+        if start_line > end_line
+          let tmp = start_line
+          let start_line = end_line
+          let end_line = tmp
+        endif
+
+        for cur_sha in [sha, strpart(sha, 0, 8)]
+          let git_show_cmd =
+                \ printf(
+                \ 'git show -p %s:%s | bat -l %s -P -r %d:%d',
+                \ cur_sha,
+                \ git_rel_path,
+                \ &filetype,
+                \ start_line,
+                \ end_line
+                \ )
+
+          call add(git_show_paths, git_show_cmd)
+
+          call add(options, git_show_cmd)
+          call add(labels, ': ' . git_show_cmd)
+        endfor
+      endif
+    endif
+
+    " --------------------------------------------------------
+    " menu
+    " --------------------------------------------------------
+
+    let menu = ['Choose path format to copy:']
+
+    let idx = 1
+    for label in labels
+      call add(menu, printf('%d. %s', idx, label))
+      let idx += 1
+    endfor
+
+    let choice = inputlist(menu)
+
+    if choice < 1 || choice > len(options)
+      return
+    endif
+
+    let selected = options[choice - 1]
+
+    let @+ = selected
+
+    echo '✅ Copied: ' . selected
+  endfunction
+
+  " Normal mode
+  nnoremap <silent> <leader>Y :call <SID>CopyPathMenu()<CR>
+
+  " Visual mode
+  xnoremap <silent> <leader>Y :<C-U>call <SID>CopyPathMenu()<CR>
+
+augroup END
