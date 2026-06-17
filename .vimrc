@@ -1151,6 +1151,9 @@ augroup PluginGit
       return
     endif
 
+    " 先強制清除本 buffer 所有 signs (避免使用 :e 還有舊的殘留)
+    execute 'sign unplace * buffer=' . l:buf
+
     " Get unified diff with 0 context
     let l:diff = system('git --no-pager diff -U0 --relative -- ' . shellescape(l:file))
     if v:shell_error || empty(l:diff)
