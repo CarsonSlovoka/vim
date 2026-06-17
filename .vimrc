@@ -32,6 +32,8 @@ set incsearch  " 邊搜尋的時候，就會出現結果，而不需要等到ent
 set noswapfile
 set nobackup
 
+set nowrap  " 禁止長行自動換行
+
 set foldcolumn=0  " 不顯示, 要的時候再自己設定. 比較常用的是2
 " 設定 foldlevel 0~9
 for i in range(0, 9)
