@@ -43,6 +43,37 @@ for i in range(0, 9)
     execute printf('nnoremap <leader>fc%d :set foldcolumn=%d<CR>', i, i)
 endfor
 
+" 🟧 tabline
+set tabline=%!MyTabLine()
+function! MyTabLine()
+  let s = ''
+  for i in range(1, tabpagenr('$'))
+    if i == tabpagenr()
+      let s .= '%#TabLineSel#'
+    else
+      let s .= '%#TabLine#'
+    endif
+
+    "let s .= '%' . i . 'T'         " 滑鼠點擊用
+    let s .= ' ' . i . ' '          " ← 顯示 tab 數字
+    let winnr = tabpagewinnr(i)
+    let buflist = tabpagebuflist(i)
+    let buf = buflist[winnr -1] " vim 下標從0開始, 而如果是lua是從1開始(不需要減1)
+    let filename = fnamemodify(bufname(buf), ':t')
+    if filename == ''
+      let filename = '[No Name]'
+    endif
+    let s .=  filename . ' '
+
+    if getbufvar(buf, '&modified')
+      let s .= '[+] ' " 可以曉得是不是被修改過(還沒有存檔)
+    endif
+  endfor
+
+  let s .= '%#TabLineFill#%T'
+  return s
+endfunction
+
 " 🟧 indent_size, indent_style
 set tabstop=2         " Tab鍵等於2個空白
 set softtabstop=2     " 在插入模式下，Tab鍵也等於2空白
@@ -209,6 +240,8 @@ nnoremap <A-k> <C-w>k<CR>
 nnoremap <A-l> <C-w>l<CR>
 
 nnoremap <leader><leader>t :term<CR>
+
+nnoremap <A-t> :tabnew<CR>
 
 nnoremap <leader>/ :nohlsearch<CR>
 
