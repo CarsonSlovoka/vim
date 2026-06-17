@@ -254,6 +254,14 @@ nnoremap <A-j> <C-w>j<CR>
 nnoremap <A-k> <C-w>k<CR>
 nnoremap <A-l> <C-w>l<CR>
 
+" clist, llist
+" nnoremap [q :cprevious<CR>   " 這種寫法對有用到v:count1會不能用
+nnoremap <silent> [q :<C-u>execute v:count1 . "cprevious"<CR>
+nnoremap <silent> ]q :<C-u>execute v:count1 . "cnext"<CR>
+nnoremap <silent> [l :<C-u>execute v:count1 . "lprevious"<CR>
+nnoremap <silent> ]l :<C-u>execute v:count1 . "lnext"<CR>
+
+
 " 在當前的目錄開啟term
 " nnoremap <leader><leader>t :term<CR>
 nnoremap <leader><leader>t :execute 'cd ' . expand('%:h') \| term<CR>
