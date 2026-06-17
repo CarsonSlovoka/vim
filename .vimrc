@@ -274,6 +274,12 @@ nnoremap <leader>/ :nohlsearch<CR>
 
 nnoremap <leader>cd :execute 'cd ' . expand('%:p:h') \| echo getcwd()<CR>
 
+" Note: 如果要將efm改成預設，可以用 `:set efm&`
+nnoremap <leader>cadde :set efm=%f<CR>
+  \ :execute 'lcd ' . expand('%:p:h')<CR>
+  \ :caddexpr systemlist('fd ')<Left><Left>
+  "\ :cgetexpr systemlist('fd ')<Left><Left>  " 這個每次都是新的, 用caddexpr會比較好, 可以添加
+
 " link
 vnoremap <leader><leader>l c[<C-r>"]()<Left>
 
