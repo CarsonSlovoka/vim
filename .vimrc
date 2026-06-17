@@ -90,8 +90,9 @@ hi StatusLineTermNC ctermbg=NONE     cterm=NONE
 
 
 " 🟧 highlight
-set background=dark
-colorscheme wildcharm   " darkblue, habamax, slate, unokai, wildcharm " 能與CursorLine, CursorColumn匹配
+" 預設的主題顏色, 都不太好, 使用自定
+" set background=dark
+" colorscheme wildcharm   " darkblue, habamax, slate, unokai, wildcharm " 能與CursorLine, CursorColumn匹配
 
 " :help hi
 " Warn: 是用NONE而不是None
@@ -104,8 +105,97 @@ highlight CursorColumn   cterm=NONE guibg=#2f3e54  ctermfg=NONE
 "set cursorlineopt=number,line  " 這是預設
 set cursorlineopt=line
 
-highlight IncSearch guifg=#161b22 guibg=#f0883e
-highlight Visual    guifg=#ffffff guibg=#78120d
+" 搜尋與選擇
+hi Search           guifg=#ffffff guibg=#ff520d
+hi IncSearch        guifg=#0d1117 guibg=#ffa657  " guifg=#161b22 guibg=#f0883e
+hi Visual           guifg=#ffffff guibg=#78120d  " guibg=#2f81f7 guifg=#ffffff
+
+" 基礎顏色
+hi Normal           guifg=#e6edf3 guibg=#0d1117
+hi NormalNC         guifg=#e6edf3 guibg=#0d1117
+hi NormalFloat      guifg=#e6edf3 guibg=#161b22
+hi FloatBorder      guifg=#30363d guibg=#161b22
+
+" 編輯器 UI
+hi Cursor           guifg=#0d1117 guibg=#e6edf3
+" hi CursorLine       guibg=#21262d
+" hi CursorColumn     guibg=#21262d
+hi ColorColumn      guibg=#21262d
+hi LineNr           guifg=#6e7681
+hi CursorLineNr     guifg=#e6edf3 guibg=#21262d
+hi SignColumn       guifg=#6e7681 guibg=#0d1117
+hi VertSplit        guifg=#30363d
+hi WinSeparator     guifg=#30363d
+hi Folded           guifg=#8b949e guibg=#21262d
+hi FoldColumn       guifg=#6e7681
+hi EndOfBuffer      guifg=#21262d
+
+" 彈出視窗
+hi Pmenu            guifg=#e6edf3 guibg=#161b22
+hi PmenuSel         guifg=#ffffff guibg=#2f81f7
+hi PmenuSbar        guibg=#21262d
+hi PmenuThumb       guibg=#6e7681
+
+" 狀態列
+hi StatusLine       guifg=#0d1117 guibg=#58a6ff gui=bold
+hi StatusLineNC     guifg=#8b949e guibg=#21262d
+
+" 語法高亮 (最接近 github_dark_default)
+hi Comment          guifg=#8b949e gui=italic
+hi Constant         guifg=#79c0ff
+hi String           guifg=#a5d6ff
+hi Character        guifg=#a5d6ff
+hi Number           guifg=#79c0ff
+hi Boolean          guifg=#79c0ff
+hi Float            guifg=#79c0ff
+
+hi Identifier       guifg=#e6edf3
+hi Function         guifg=#d2a8ff
+
+hi Statement        guifg=#ff7b72
+hi Conditional      guifg=#ff7b72
+hi Repeat           guifg=#ff7b72
+hi Label            guifg=#ff7b72
+hi Operator         guifg=#79c0ff
+hi Keyword          guifg=#ff7b72
+
+hi PreProc          guifg=#ff7b72
+hi Type             guifg=#ffa657
+hi StorageClass     guifg=#ffa657
+hi Structure        guifg=#ffa657
+hi Typedef          guifg=#ffa657
+
+hi Special          guifg=#e6edf3
+hi Tag              guifg=#7ee787
+hi Delimiter        guifg=#e6edf3
+
+hi Underlined       guifg=#58a6ff gui=underline
+hi Error            guifg=#f85149
+hi Todo             guifg=#0d1117 guibg=#d29922 gui=bold
+
+" Diff
+hi DiffAdd          guifg=#aff5b4 guibg=#033a16
+hi DiffDelete       guifg=#ffdcd7 guibg=#67060c
+hi DiffChange       guifg=#ffdfb6 guibg=#5a1e02
+hi DiffText         guifg=#e6edf3 guibg=#5a1e02
+
+" LSP / Diagnostic
+hi DiagnosticError  guifg=#f85149
+hi DiagnosticWarn   guifg=#d29922
+hi DiagnosticInfo   guifg=#2f81f7
+hi DiagnosticHint   guifg=#8b949e
+
+"" Treesitter 相關 (vi不能這樣設定)
+"hi @keyword         guifg=#ff7b72
+"hi @function        guifg=#d2a8ff
+"hi @variable        guifg=#e6edf3
+"hi @string          guifg=#a5d6ff
+"hi @type            guifg=#ffa657
+"hi @constant        guifg=#79c0ff
+"hi @comment         guifg=#8b949e gui=italic
+"hi @tag             guifg=#7ee787
+"hi @attribute       guifg=#d2a8ff
+
 
 " 🟧 keymap
 nnoremap Q :q<CR>
