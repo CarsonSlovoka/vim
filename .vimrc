@@ -288,6 +288,7 @@ nnoremap <silent> ]l :<C-u>execute v:count1 . "lnext"<CR>
 " nnoremap <leader><leader>t :term<CR>
 nnoremap <leader><leader>t :execute 'cd ' . expand('%:h') \| term<CR>
 nnoremap <leader>t :execute 'e ' . expand('%:h')<CR>
+nnoremap <leader>e :execute 'e ' . expand('%:h')<CR>
 
 "nnoremap <A-t> :tabnew<CR>
 nnoremap <A-t> :execute 'tabnew ' . expand('%:p')<CR>
