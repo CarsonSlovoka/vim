@@ -1153,6 +1153,36 @@ augroup PluginGit
     lfirst
   endfunction
 
+  function! GitLsFiles(is_loclist, options, args)
+    execute 'lcd' fnameescape(expand('%:h'))
+    let l:output = system('git status -s')
+    if v:shell_error
+      echo "Not a git repository or git command error"
+      return
+    endif
+    let l:git_root = substitute(l:output , '\n$', '', '')
+    execute 'lcd' fnameescape(l:git_root)
+
+    let cmd = 'git ls-files --full-name ' . join(a:args, ' ')
+    let lines = systemlist(cmd)
+
+    let what = {
+        \ 'title': cmd,
+        \ 'lines': lines,
+        \ 'efm': '%f'
+        \ }
+
+    if a:is_loclist
+        call setloclist(0, [], get(a:options, 'action', ' '), what)
+        lopen
+    else
+        call setqflist([], get(a:options, 'action', ' '), what)
+        copen
+    endif
+
+  endfunction
+  command! -buffer Gitclist call GitLsFiles(true, ' ', [])
+  command! -buffer Gitllist call GitLsFiles(false, ' ', [])
 
 
   "" 定義符號樣式 (在行號欄位顯示)
