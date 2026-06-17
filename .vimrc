@@ -30,6 +30,9 @@ set cursorcolumn
 " scrolloff=999 保持在畫面中間
 set scrolloff=999
 
+" set timeoutlen=0  " 這如果設定成0, keymap的等待輸入都會看不到，例如: <leader>bk 會出問題
+" ttimeoutlen 設定
+set ttimeoutlen=0   " 設定成0之後，在Terminal按下了<Esc>a就不會被輸入成 å
 
 set hlsearch
 set incsearch  " 邊搜尋的時候，就會出現結果，而不需要等到enter才會有結果
