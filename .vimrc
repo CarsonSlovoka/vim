@@ -34,6 +34,8 @@ set nobackup
 
 set nowrap  " 禁止長行自動換行
 
+set ignorecase  " 搜尋不分大小寫, 可以用\C讓該次搜尋有區分
+
 set foldcolumn=0  " 不顯示, 要的時候再自己設定. 比較常用的是2
 " 設定 foldlevel 0~9
 for i in range(0, 9)
