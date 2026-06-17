@@ -1137,9 +1137,9 @@ augroup PluginGit
   "hi DiffAdd    ctermfg=Green  ctermbg=NONE
   "hi DiffChange ctermfg=Yellow ctermbg=NONE
   "hi DiffDelete ctermfg=Red    ctermbg=NONE
-  sign define GitAdd    text=+ texthl=DiffAdd
-  sign define GitChange text=! texthl=DiffChange
-  sign define GitDelete text=- texthl=DiffDelete
+  sign define GitAdd    text=│ texthl=DiffAdd
+  sign define GitChange text=│ texthl=DiffChange
+  sign define GitDelete text=│ texthl=DiffDelete
 
   function! UpdateGitSigns()
   " 1. 取得當前 buffer 的編號與路徑
