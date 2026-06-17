@@ -1292,3 +1292,158 @@ augroup PluginGit
   nnoremap ]c :call GitGutterJump('next')<CR>
   nnoremap [c :call GitGutterJump('prev')<CR>
 augroup END
+
+" ============================================================
+" Markdown
+" ============================================================
+augroup PluginMarkdownPreview
+  autocmd!
+  autocmd FileType markdown call MarkdownSetup()
+
+  function! MarkdownSetup()
+    " 摺疊 Markdown 標題
+    setlocal foldmethod=expr
+    setlocal foldexpr=MarkdownFold(v:lnum)
+  endfunction
+
+  function! MarkdownFold(lnum)
+    let line = getline(a:lnum)
+
+    if line =~ '^# '
+      return '>1'
+    elseif line =~ '^## '
+      return '>2'
+    elseif line =~ '^### '
+      return '>3'
+    elseif line =~ '^#### '
+      return '>4'
+    elseif line =~ '^##### '
+      return '>5'
+    elseif line =~ '^###### '
+      return '>6'
+    endif
+
+    return '='
+  endfunction
+
+  autocmd FileType markdown command! -buffer MdRead call MarkdownReadMode()
+  function! MarkdownReadMode()
+    "" 自動換行
+    setlocal wrap
+
+    "" 單字邊界換行，不會切到單字中間
+    setlocal linebreak
+
+    " 保留縮排
+    setlocal breakindent
+
+    " 顯示目前所在行
+    setlocal cursorline
+
+    " 不顯示空白字元
+    setlocal nolist
+
+    " 不顯示行號
+    setlocal nonumber
+    setlocal norelativenumber
+
+    " 預設展開所有內容
+    normal! zR
+
+    "set foldcolumn=0
+    "set signcolumn=no
+    "set laststatus=0
+    "set cmdheight=1
+
+    " 搜尋時置中
+    "nnoremap <buffer> n nzzzv
+    "nnoremap <buffer> N Nzzzv
+
+    " Space 可以快速往下翻頁
+    nnoremap <buffer> <Space> <C-d>
+
+    " Backspace 往上翻頁
+    nnoremap <buffer> <BS> <C-u>
+
+    " Tab 展開/收合標題
+    nnoremap <buffer> <Tab> za
+  endfunction
+augroup END
+
+
+augroup MarkdownConceal
+    autocmd!
+    autocmd FileType markdown call MarkdownConceal()
+augroup END
+
+function! MarkdownConceal()
+  setlocal conceallevel=2
+
+  " Checkbox
+  syntax match MdTodoOpen '\[ \]' conceal cchar=🔳
+  syntax match MdTodoDone '\[x\]' conceal cchar=✅
+  syntax match MdTodoDone '\[X\]' conceal cchar=✅
+
+  " Header Mark
+  "可用，但是顏色就會沒有了
+  "syntax match MdH1Mark '^# ' conceal
+  "syntax match MdH2Mark '^## ' conceal
+
+endfunction
+
+" ============================================================
+" Markdown 顏色強化
+" ============================================================
+augroup MarkdownHighlight
+  autocmd!
+  autocmd FileType markdown call MarkdownHighlight()
+  function! MarkdownHighlight()
+    "--- Level 1: 主標題 (紅色系) ---
+    syntax match MdH1 /^# .*$/
+    "syntax match MdH1 /^# .\{0,120}\.*$/
+    hi default link MdH1 Normal
+    "hi MdH1 gui=bold guifg=#ff5f87
+    hi MdH1 gui=bold guifg=#ff7f69 guibg=#3e2b2f
+
+    " --- Level 2: 副標題 (藍色系) ---
+    syntax match MdH2 /^## .\{0,120}\.*$/
+    hi default link MdH2 Normal
+    "hi MdH2 gui=bold guifg=#50fa7b
+    hi MdH2 gui=bold guifg=#4fa3d1 guibg=#2c4556
+
+    " --- Level 3: 章節標題 (橘色系) ---
+    syntax match MdH3 /^### .\{0,120}\.*$/
+    hi default link MdH3 Normal
+    "hi MdH3 gui=bold guifg=#ffcb6b
+    hi MdH3 gui=bold guifg=#57a68d guibg=#3a4e3c
+
+    " --- Level 4: 子標題 (紫色系) ---
+    syntax match MdH4 /^#### .\{0,120}\.*$/
+    hi default link MdH4 Normal
+    "hi MdH4 gui=bold guifg=#c678dd
+    hi MdH4 gui=bold guifg=#9b72aa guibg=#3a2e44
+
+    " --- Level 5 & 6: 細節標題 (淡紫/粉紅系) ---
+    syntax match MdH5 /^##### .\{0,120}\.*$/
+    hi default link MdH5 Normal
+    "hi MdH5 gui=bold guifg=#ff79c6
+    hi MdH5 gui=bold guifg=#c0c0c0 guibg=#4a3b5e
+
+    syntax match MdH6 /^###### .\{0,120}\.*$/
+    hi default link MdH6 Normal
+    "hi MdH6 gui=bold guifg=#b16286
+    hi MdH6 gui=bold guifg=#b16286 guibg=#3a2e3c
+
+    " Code Block
+    syntax region MdCodeBlock
+      \ start=/^\s*```/
+      \ end=/^\s*```/
+
+    hi default MdCodeBlock ctermbg=236 guibg=#37365c
+
+    " Inline code
+    syntax match MdInlineCode /`[^`]\+`/
+    hi default MdInlineCode ctermfg=220 guifg=#f1fa8c
+
+  endfunction
+augroup END
