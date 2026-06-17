@@ -262,6 +262,8 @@ nnoremap <A-t> :tabnew<CR>
 
 nnoremap <leader>/ :nohlsearch<CR>
 
+nnoremap <leader>cd :execute 'cd ' . expand('%:p:h') \| echo getcwd()<CR>
+
 " link
 vnoremap <leader><leader>l c[<C-r>"]()<Left>
 
