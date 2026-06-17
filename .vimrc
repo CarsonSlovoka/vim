@@ -1414,7 +1414,13 @@ augroup PluginGit
   autocmd BufReadPost,BufWritePost,CursorHold,CursorHoldI,BufEnter * call UpdateGitSigns()
 
   function! GitGutterJump(direction)
-    execute 'cd' fnameescape(expand('%:p:h'))
+    if &diff
+      " 在diff模式下直接執行原生命令。詳: `:help diff` 再搜尋: &diff
+      execute 'normal! ' . (a:direction == 'next' ? ']c' : '[c')
+      return
+    endif
+
+    execute 'lcd' fnameescape(expand('%:p:h'))
 
     " 執行 git diff 獲取異動行號 (Warn: 要用--no-pager, 避免有的是用gitdelta可能是不同的主題，輸出會抓不到)
     " 到grep '^@@的結果可能如下
@@ -1459,7 +1465,6 @@ augroup PluginGit
       echo "No more changes in this direction."
     endif
   endfunction
-  " TODO 但如果設定了之後，原本在 :difft 中的跳轉就不能用了
   nnoremap ]c :call GitGutterJump('next')<CR>
   nnoremap [c :call GitGutterJump('prev')<CR>
 augroup END
