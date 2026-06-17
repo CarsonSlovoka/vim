@@ -496,3 +496,6 @@ augroup filetype_indent
 
 augroup END
 
+
+" 移除每一列結尾多餘的空白
+autocmd BufWritePre * %s/\s\+$//e
