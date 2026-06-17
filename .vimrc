@@ -848,9 +848,6 @@ augroup PluginGitlist
 
     let l:lines = systemlist(l:cmd)
 
-    if options.cd
-      execute 'cd' fnameescape(l:old_cwd)
-    endif
 
     if a:is_loclist
       call setloclist(
@@ -875,6 +872,10 @@ augroup PluginGitlist
             \ })
 
       copen
+    endif
+
+    if options.cd
+      execute 'cd' fnameescape(l:old_cwd)
     endif
   endfunction
 
