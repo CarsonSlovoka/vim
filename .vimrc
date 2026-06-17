@@ -1701,3 +1701,150 @@ augroup MarkdownHighlight
 
   endfunction
 augroup END
+
+
+" ============================================================
+" Rg Command
+" :Rg Test -g '*.go'
+"
+" TODO: 當前選完之後要用 gF 來手動跳轉
+" ============================================================
+augroup PluginRg
+  autocmd!
+  let s:rg_buf = -1
+  let s:rg_is_files = 0
+  command! -nargs=* Rg call Rg(<q-args>)
+augroup END
+
+function! Rg(args) abort
+  if !executable('rg')
+    echohl ErrorMsg
+    echom 'rg not found'
+    echohl None
+    finish
+  endif
+
+  if !executable('fzf')
+    echohl ErrorMsg
+    echom 'fzf not found'
+    echohl None
+    finish
+  endif
+
+  execute 'lcd' expand('%:p:h')
+
+  let git_root = substitute(
+        \ system('git rev-parse --show-toplevel'),
+        \ '\n$',
+        \ '',
+        \ '')
+
+  if v:shell_error == 0
+    execute 'lcd' git_root
+  endif
+
+  tabnew
+  setlocal buftype=nofile
+
+  let s:rg_buf = bufnr('%')
+
+  let s:rg_is_files = a:args =~# '--files'
+
+  if filereadable(expand('~/fzf/bin/fzf-preview.sh'))
+    let preview_cmd =
+          \ printf(
+          \ '--preview "%s {}"',
+          \ expand('~/fzf/bin/fzf-preview.sh')
+          \ )
+  else
+    let preview_cmd =
+          \ '--preview "bat --color=always --style=numbers {}"'
+  endif
+
+  if s:rg_is_files
+
+    let cmd =
+          \ 'rg ' . a:args .
+          \ ' | fzf --style full --multi ' .
+          \ preview_cmd . ' ' .
+          \ "--bind 'ctrl-q:select-all+accept'"
+
+  else
+
+    let cmd =
+          \ 'rg --vimgrep ' . a:args .
+          \ ' | fzf ' .
+          \ '--delimiter=: ' .
+          \ '--multi ' .
+          \ '--preview-window=right:+{2} ' .
+          \ '--preview "bat --color=always --style=numbers --highlight-line {2} {1}" ' .
+          \ "--bind 'ctrl-q:select-all+accept'"
+
+  endif
+
+  call term_start(
+        \ [&shell, &shellcmdflag, cmd],
+        \ {
+        \ 'curwin': v:true,
+        \ 'exit_cb': function('RgExit')
+        \ })
+
+  startinsert
+
+endfunction
+
+function! RgExit(job, status) abort
+  let lines = getbufline(s:rg_buf, 1, '$')
+  " 1. 先清理所有 ANSI 與特殊字元 即: 如果行首包含非字母/路徑符號，直接將其截斷 (使得不會將視覺指標也算進去)
+  call map(lines, 'substitute(v:val, "\e\\[[0-9;]*[mK]", "", "g")')
+  call map(lines, 'trim(v:val)') " 移除前後空白
+  let lines = filter(lines, '!empty(v:val)')
+
+  if empty(lines) | return | endif
+
+  call setqflist([], 'r')
+
+  " 處理邏輯
+  for line in lines
+    " 這裡將正規表示式改得更有彈性
+    " 嘗試匹配：路徑:行號:列號 或 純路徑
+    let m = matchlist(line, '\v^([^:]+):?(\d+)?:?(\d+)?:?(.*)$')
+
+    if empty(m) | continue | endif
+
+    let lnum = !empty(m[2]) ? str2nr(m[2]) : 1
+    let col = !empty(m[3]) ? str2nr(m[3]) : 1
+
+    call setqflist([
+          \ {
+          \ 'filename': m[1],
+          \ 'lnum': lnum,
+          \ 'col': col,
+          \ 'text': m[4]
+          \ }
+          \ ], 'a')
+  endfor
+
+  " 確保 Quickfix 列表不為空
+  let qf_list = getqflist()
+  if empty(qf_list)
+    return
+  endif
+
+  let target = qf_list[0]
+
+  " 檢查 filename 是否為字串且存在
+  if has_key(target, 'filename') && !empty(target.filename)
+    let fname = target.filename
+    " 確保路徑是絕對路徑或正確的相對路徑
+    execute 'edit' fnameescape(fname)
+
+    " 跳轉到行與列 (如果沒有值則預設為 1)
+    let lnum = get(target, 'lnum', 1)
+    let col = get(target, 'col', 1)
+    call cursor(lnum, col)
+  else
+    echom "Error: target.filename is missing or empty"
+    echom "Target content: " . string(target)
+  endif
+endfunction
