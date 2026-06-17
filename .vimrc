@@ -508,3 +508,71 @@ augroup END
 
 " 移除每一列結尾多餘的空白
 autocmd BufWritePre * %s/\s\+$//e
+
+
+" 🟧 Plugin
+augroup PluginBookmark
+  " 存放書籤的字典
+  let g:bookmarks = {}
+  let g:bookmarks_file = expand('~/.vim/bookmarks.json')
+
+  " 讀取書籤
+  function! LoadBookmarks()
+    if filereadable(g:bookmarks_file)
+      let g:bookmarks = json_decode(join(readfile(g:bookmarks_file), ''))
+    else
+      let g:bookmarks = {}
+    endif
+  endfunction
+  call LoadBookmarks()
+
+  " 設定書籤 (:BkAdd Foo)
+  command! -nargs=1 BkAdd call SetBookmark(<q-args>)
+  function! SetBookmark(name)
+    let g:bookmarks[a:name] = [expand('%:p'), getpos('.')]
+    echo "Bookmarked: " . a:name
+  endfunction
+
+  " 刪除書籤( :BkRm Foo)
+  command! -nargs=1 -complete=customlist,BookmarkComplete BkRm call RemoveBookmark(<q-args>)
+  function! RemoveBookmark(name)
+    if has_key(g:bookmarks, a:name)
+      call remove(g:bookmarks, a:name)
+      echo "Removed bookmark: " . a:name
+    else
+      echo "Bookmark not found: " . a:name
+    endif
+  endfunction
+
+  " 跳到書籤 (:GotoBookmark Foo)
+  command! -nargs=1 -complete=customlist,BookmarkComplete GotoBookmark call GotoBookmark(<q-args>)
+  function! GotoBookmark(name)
+    if has_key(g:bookmarks, a:name)
+      let [file, pos] = g:bookmarks[a:name]
+      exec 'edit ' . file
+      call setpos('.', pos)
+      echo "Jumped to: " . a:name
+    else
+      echo "Bookmark not found: " . a:name
+    endif
+  endfunction
+  " bk方便呼叫
+  nnoremap bk :GotoBookmark
+
+  " 補全功能
+  function! BookmarkComplete(A, L, P)
+    return keys(g:bookmarks)
+  endfunction
+
+  " 儲存到 viminfo 或檔案，讓重開 Vim 還在(它能保存全域變數，也就是g:的所有內容)
+  " ! 這個旗標特別表示：儲存那些名稱以大寫字母開頭、且不含小寫字母的全域變數
+  "set viminfo+=!  " 👈 沒用，還是沒辦法保存
+
+  " 儲存書籤
+  function! SaveBookmarks()
+    call writefile([json_encode(g:bookmarks)], g:bookmarks_file)
+  endfunction
+
+  autocmd VimLeave * call SaveBookmarks()
+augroup END
+
