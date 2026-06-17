@@ -79,9 +79,9 @@ function! MyTabLine()
 endfunction
 
 " 🟧 indent_size, indent_style
-set tabstop=2         " Tab鍵等於2個空白
-set softtabstop=2     " 在插入模式下，Tab鍵也等於2空白
-set shiftwidth=2      " 自動縮進時使用 2 個空白
+set tabstop=4         " Tab鍵等於2個空白
+set softtabstop=4     " 在插入模式下，Tab鍵也等於2空白
+set shiftwidth=4      " 自動縮進時使用 2 個空白
 set foldmethod=indent " 如果上面的沒設定，只設indent也沒用
 
 
@@ -293,3 +293,44 @@ function! HighlightYank()
 
     call timer_start(700, {-> matchdelete(l:id)})
 endfunction
+
+
+augroup filetype_indent
+  " autocmd! 會先清除同 group 內之前的設定，防止重複
+  autocmd!
+
+  " 這種寫法會有問題，吃不到設定
+  "  autocmd FileType md,yml,yaml,json,json5,jsonc,toml,xml,svg,ttx,
+  "              \ gs,gohtml,gotmpl,html,js,javascript,mjs,ts,mts,
+  "              \ css,scss,sass,lua,vim,vue,sh,zsh,dart
+  "              \ setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+
+  " Tip: `:verbose setlocal tabstop?`  " 加上verbose可以顯示設定是來至哪裡
+  autocmd FileType *
+                  \ if index(['md','markdown',
+                  \           'yml','yaml',
+                  \           'json','json5','jsonc',
+                  \           'toml',
+                  \           'xml','svg','ttx',
+                  \           'gs',
+                  \           'gohtml','gotmpl',
+                  \           'html',
+                  \           'js','javascript','mjs','ts','mts',
+                  \           'css','scss','sass',
+                  \           'lua',
+                  \           'vim',
+                  \           'vue',
+                  \           'sh','zsh',
+                  \           'dart',
+                  \           ], &ft) >= 0
+                  \ |   setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+                  \ | else
+                  \ |   setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
+                  \ | endif
+
+  " `:verbose setlocal expandtab?`
+  autocmd FileType go,puml,nsi.nsh,Makefile,mk
+    \ setlocal noexpandtab
+
+augroup END
+
