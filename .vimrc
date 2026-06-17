@@ -119,17 +119,11 @@ set statusline+=\ %l:%c                 " Current {line, column} number
 if exists('+termguicolors')
   set termguicolors    " 這如果沒有設定，有的顏色看起來不好看
 endif
-hi StatusLine       ctermbg=DarkGray cterm=NONE              " 用Blue也不錯
-hi StatusLineNC     ctermbg=NONE     guifg=Gray cterm=NONE   " 非選中的顏色
-
-" termnial的status line也要設定, 兩者可以不同
-hi StatusLineTerm   ctermbg=DarkGray cterm=NONE
-hi StatusLineTermNC ctermbg=NONE     cterm=NONE
 
 
 " 🟧 highlight
-" 預設的主題顏色, 都不太好, 使用自定
-" set background=dark
+" 預設的主題(colorscheme)顏色, 都不太好, 使用自定
+set background=dark       " Important: 這個還是要選，它也會影響到highlight的結果
 " colorscheme wildcharm   " darkblue, habamax, slate, unokai, wildcharm " 能與CursorLine, CursorColumn匹配
 
 " :help hi
@@ -176,10 +170,17 @@ hi PmenuThumb       guibg=#6e7681
 
 " 狀態列
 hi StatusLine       guifg=#0d1117 guibg=#58a6ff gui=bold
-hi StatusLineNC     guifg=#8b949e guibg=#21262d
+hi StatusLineNC     guifg=#0d1117 guibg=#8b949e
+" termnial的status line也要設定, 兩者可以不同
+hi StatusLineTerm   guifg=#0d1117 guibg=#58a6ff gui=bold
+hi StatusLineTermNC guifg=#0d1117 guibg=#8b949e
 
-" 語法高亮 (最接近 github_dark_default)
+
+" 語法高亮
 hi Comment          guifg=#8b949e gui=italic
+"hi link vimLineComment    Comment  " 可以不用設定會延用
+"hi link shComment         Comment
+
 hi Constant         guifg=#79c0ff
 hi String           guifg=#a5d6ff
 hi Character        guifg=#a5d6ff
