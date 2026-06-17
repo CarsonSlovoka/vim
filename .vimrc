@@ -195,6 +195,10 @@ hi StatusLineNC     guifg=#0d1117 guibg=#8b949e
 hi StatusLineTerm   guifg=#0d1117 guibg=#58a6ff gui=bold
 hi StatusLineTermNC guifg=#0d1117 guibg=#8b949e
 
+" Tabline
+hi TabLineSel   guifg=#A9B665 guibg=#282828 gui=bold ctermfg=2 ctermbg=235 cterm=bold
+hi TabLine      guifg=#7C6F64 guibg=#3C3836 ctermfg=243 ctermbg=237
+hi TabLineFill  guifg=#1D2021 guibg=#1D2021 ctermfg=234 ctermbg=234
 
 " 語法高亮
 hi Comment          guifg=#8b949e gui=italic
