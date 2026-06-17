@@ -303,27 +303,47 @@ function! Inspect()
   let l:pos = [line('.'), col('.')]
   let l:synstack = synstack(l:pos[0], l:pos[1])
 
+  " 清空之前的訊息，避免干擾
+  echo "\n"
+
+  echohl Title
   echo "=== Inspect at (" . l:pos[0] . "," . l:pos[1] . ") ==="
+  echohl None
 
   if empty(l:synstack)
+    echohl WarningMsg
     echo "No syntax highlight found."
+    echohl None
     return
   endif
 
+  echohl Statement
   echo "Syntax stack (from bottom to top):"
+  echohl None
+
   for id in l:synstack
     let name = synIDattr(id, "name")
-    echo "  • " . name
+    echohl Identifier
+    echo " • " . name
+    echohl None
   endfor
 
   " 最上層的 highlight group
   let hi = synIDattr(synID(l:pos[0], l:pos[1], 1), "name")
-  echo "\nDirect highlight group: " . hi
+  echohl Statement
+  echo "\nDirect highlight group:"
+  echohl Identifier
+  echon " " . hi
+  echohl None
 
   " 最終連結到的 group
   let lo = synIDattr(synIDtrans(synID(l:pos[0], l:pos[1], 1)), "name")
   if hi != lo
-    echo "Links to: " . lo
+    echohl Statement
+    echon " → Links to: "
+    echohl Identifier
+    echon lo
+    echohl None
   endif
 
   " 顯示 highlight 設定
@@ -331,8 +351,64 @@ function! Inspect()
     redir => hl_output
     silent execute 'highlight ' . hi
     redir END
-    echo "\nHighlight definition:"
-    echo trim(hl_output)
+
+    echohl Statement
+    echo "\nHighlight definition:\n"
+    echohl None
+
+    let lines = split(trim(hl_output), "\n")
+    for line in lines
+      let line = trim(line)
+
+      " 處理 "xxx links to yyy" 的情況
+      if line =~# '\clinks to'
+        let group = matchstr(line, '^\s*\zs\w\+')
+        let target = matchstr(line, '\clinks to \zs\w\+')
+
+        if hlexists(group)
+          execute 'echohl ' . group
+          echon group
+          echohl None
+        else
+          echohl Identifier
+          echon group
+          echohl None
+        endif
+
+        echohl Statement
+        echon " links to "
+        echohl None
+
+        if hlexists(target)
+          execute 'echohl ' . target
+          echon target
+          echohl None
+        else
+          echohl Identifier
+          echon target
+          echohl None
+        endif
+
+      " 一般 highlight 定義（ctermfg、guifg 等）
+      else
+        let group = matchstr(line, '^\s*\zs\w\+')
+        let attrs = matchstr(line, '^\s*\w\+\s*\zs.*')
+
+        if hlexists(group)
+          execute 'echohl ' . group
+          echon group
+          echohl None
+        else
+          echohl Identifier
+          echon group
+          echohl None
+        endif
+
+        echohl Comment
+        echon " " . attrs
+        echohl None
+      endif
+    endfor
   endif
 endfunction
 " command! Inspect echo synIDattr(synID(line("."),col("."),1),"name")   " 👈 這可行，但比較簡單
