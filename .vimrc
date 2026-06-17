@@ -250,6 +250,32 @@ nnoremap <A-t> :tabnew<CR>
 
 nnoremap <leader>/ :nohlsearch<CR>
 
+
+" Wrap selection / word with double quotes
+nnoremap <leader>" viw<Esc>`>a"<Esc>`<i"<Esc>
+vnoremap <leader>" <Esc>`>a"<Esc>`<i"<Esc>
+
+" Wrap selection / word with single quotes
+nnoremap <leader>' viw<Esc>`>a'<Esc>`<i'<Esc>
+vnoremap <leader>' <Esc>`>a'<Esc>`<i'<Esc>
+
+" Wrap selection / word with backticks
+nnoremap <leader>` viw<Esc>`>a`<Esc>`<i`<Esc>
+vnoremap <leader>` <Esc>`>a`<Esc>`<i`<Esc>
+
+" Wrap selection / word with parentheses
+nnoremap <leader>( viw<Esc>`>a)<Esc>`<i(<Esc>
+vnoremap <leader>( <Esc>`>a)<Esc>`<i(<Esc>
+
+" Wrap selection / word with square brackets
+nnoremap <leader>[ viw<Esc>`>a]<Esc>`<i[<Esc>
+vnoremap <leader>[ <Esc>`>a]<Esc>`<i[<Esc>
+
+" Wrap selection / word with curly braces
+nnoremap <leader>{ viw<Esc>`>a}<Esc>`<i{<Esc>
+vnoremap <leader>{ <Esc>`>a}<Esc>`<i{<Esc>
+
+
 " Tip: terminal中可以用 <C-w>" 後面可以接暫存器的名稱，就可以貼上該內容
 tnoremap <C-r> <C-w>"
 
