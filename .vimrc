@@ -1134,9 +1134,9 @@ augroup PluginGit
   "set signcolumn=yes
   "set updatetime=300
   "hi SignColumn guibg=NONE ctermbg=NONE
-  hi DiffAdd    ctermfg=Green  ctermbg=NONE
-  hi DiffChange ctermfg=Yellow ctermbg=NONE
-  hi DiffDelete ctermfg=Red    ctermbg=NONE
+  "hi DiffAdd    ctermfg=Green  ctermbg=NONE
+  "hi DiffChange ctermfg=Yellow ctermbg=NONE
+  "hi DiffDelete ctermfg=Red    ctermbg=NONE
   sign define GitAdd    text=+ texthl=DiffAdd
   sign define GitChange text=! texthl=DiffChange
   sign define GitDelete text=- texthl=DiffDelete
