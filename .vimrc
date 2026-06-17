@@ -43,6 +43,10 @@ for i in range(0, 9)
     execute printf('nnoremap <leader>fc%d :set foldcolumn=%d<CR>', i, i)
 endfor
 
+" set listchars=tab:▸\ ,trail:·,extends:❯,precedes:❮,nbsp:␣  " Note: tab要有兩個, 第二個可以用空白
+set listchars=tab:\|\ ,trail:·,multispace:\ ,nbsp:␣  " https://github.com/CarsonSlovoka/nvim/blob/f0eb3965cd3f0dd63e962ce256477a308f4c71a6/lua/config/options.lua#L190-L205
+set list  " 這也要加上 listchars 才會有用
+
 " 🟧 tabline
 set tabline=%!MyTabLine()
 function! MyTabLine()
