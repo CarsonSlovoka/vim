@@ -262,7 +262,12 @@ vnoremap <leader><leader>l c[<C-r>"]()<Left>
 inoremap <A-h> <Left>
 inoremap <A-j> <Down>
 inoremap <A-k> <Up>
-inoremap <A-l> <Left>
+inoremap <A-l> <Right>
+
+inoremap <C-h> <C-Left>
+vnoremap <C-h> <C-Left>
+inoremap <C-l> <C-Right>
+vnoremap <C-l> <C-Right>
 
 
 " Wrap selection / word with double quotes
