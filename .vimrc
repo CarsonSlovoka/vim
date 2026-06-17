@@ -1381,11 +1381,6 @@ function! MarkdownConceal()
   " Note: conceallevel=2 會自動做 bold, italic
   setlocal conceallevel=2
 
-  " Checkbox
-  syntax match MdTodoOpen '\[ \]' conceal cchar=🔳
-  syntax match MdTodoDone '\[x\]' conceal cchar=✅
-  syntax match MdTodoDone '\[X\]' conceal cchar=✅
-
   "" Link & Image
   ""syntax match MdLink /\[[^]]*\](.\{-})/ conceal cchar=🌐  " 這樣會連網址加內容都變成🌐
   "
@@ -1423,6 +1418,11 @@ function! MarkdownConceal()
   " 🌇 🌅
   syntax match MdImageOpen '!\[' conceal cchar=🌇 contained
 
+
+  " Checkbox  " Note: 需要在MdLink, MdImage之後，不然會被Link影響到
+  syntax match MdTodoOpen '\[ \]' conceal cchar=🔳
+  syntax match MdTodoDone '\[x\]' conceal cchar=✅
+  syntax match MdTodoDone '\[X\]' conceal cchar=✅
 
   " 👇 這很重要，如果conceal有用空白，它就有可能會吃到背景色, 因為可以將Conceal的顏色都關掉
   hi Conceal ctermbg=NONE ctermfg=NONE guibg=NONE guifg=NONE
