@@ -47,8 +47,8 @@ set ignorecase  " 搜尋不分大小寫, 可以用\C讓該次搜尋有區分
 set foldcolumn=0  " 不顯示, 要的時候再自己設定. 比較常用的是2
 " 設定 foldlevel 0~9
 for i in range(0, 9)
-    execute printf('nnoremap <leader>fl%d :set foldlevel=%d<CR>', i, i)
-    execute printf('nnoremap <leader>fc%d :set foldcolumn=%d<CR>', i, i)
+  execute printf('nnoremap <leader>fl%d :set foldlevel=%d<CR>', i, i)
+  execute printf('nnoremap <leader>fc%d :set foldcolumn=%d<CR>', i, i)
 endfor
 
 " set listchars=tab:▸\ ,trail:·,extends:❯,precedes:❮,nbsp:␣  " Note: tab要有兩個, 第二個可以用空白
@@ -150,8 +150,8 @@ set background=dark       " Important: 這個還是要選，它也會影響到hi
 " Warn: 是用NONE而不是None
 " highlight CursorLine   cterm=NONE ctermbg=DarkGray ctermfg=white
 " highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=white
- "highlight CursorLine   cterm=NONE ctermbg=DarkGray ctermfg=NONE " ctermfg 用None才不會影響到syntax的突顯
- "highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=NONE
+"highlight CursorLine   cterm=NONE ctermbg=DarkGray ctermfg=NONE " ctermfg 用None才不會影響到syntax的突顯
+"highlight CursorColumn cterm=NONE ctermbg=DarkGray ctermfg=NONE
 highlight CursorLine     cterm=NONE guibg=#2f3e54  ctermfg=NONE
 highlight CursorColumn   cterm=NONE guibg=#3a3a3a  ctermfg=NONE
 "set cursorlineopt=number,line  " 這是預設
@@ -303,9 +303,9 @@ nnoremap <leader>cd :execute 'cd ' . expand('%:p:h') \| echo getcwd()<CR>
 
 " Note: 如果要將efm改成預設，可以用 `:set efm&`
 nnoremap <leader>cadde :set efm=%f<CR>
-  \ :execute 'lcd ' . expand('%:p:h')<CR>
-  \ :caddexpr systemlist('fd ')<Left><Left>
-  "\ :cgetexpr systemlist('fd ')<Left><Left>  " 這個每次都是新的, 用caddexpr會比較好, 可以添加
+      \ :execute 'lcd ' . expand('%:p:h')<CR>
+      \ :caddexpr systemlist('fd ')<Left><Left>
+"\ :cgetexpr systemlist('fd ')<Left><Left>  " 這個每次都是新的, 用caddexpr會比較好, 可以添加
 
 " link
 vnoremap <leader><leader>l c[<C-r>"]()<Left>
@@ -533,7 +533,7 @@ function! s:HelpOnSelection() range
   let selected = substitute(selected, '^\s*\|\s*$', '', 'g')
 
   if empty(selected)
-   return
+    return
   endif
 
   execute 'help' selected
@@ -607,7 +607,7 @@ augroup Formatting
       echo "cargo fmt / rustfmt 執行失敗！"
       echomsg "❌ Error："
       for line in split(l:output, "\n")
-          echomsg line
+        echomsg line
       endfor
       return
     endif
@@ -627,26 +627,26 @@ augroup END
 
 
 augroup YankHighlight
-    autocmd!
-    autocmd TextYankPost * call HighlightYank()
+  autocmd!
+  autocmd TextYankPost * call HighlightYank()
 augroup END
 
 function! HighlightYank()
-    " Tip: 此版本只可適用: yw, yiw, yy  (V下的多列不行(單列可))
+  " Tip: 此版本只可適用: yw, yiw, yy  (V下的多列不行(單列可))
 
-    let l:pos = getpos("'[")
-    let l:end = getpos("']")
+  let l:pos = getpos("'[")
+  let l:end = getpos("']")
 
-    if l:pos[1] != l:end[1]
-        return
-    endif
+  if l:pos[1] != l:end[1]
+    return
+  endif
 
-    let l:id = matchaddpos(
-                \ 'IncSearch',
-                \ [[l:pos[1], l:pos[2], l:end[2]-l:pos[2]+1]]
-                \ )
+  let l:id = matchaddpos(
+        \ 'IncSearch',
+        \ [[l:pos[1], l:pos[2], l:end[2]-l:pos[2]+1]]
+        \ )
 
-    call timer_start(700, {-> matchdelete(l:id)})
+  call timer_start(700, {-> matchdelete(l:id)})
 endfunction
 
 
@@ -662,30 +662,30 @@ augroup filetype_indent
 
   " Tip: `:verbose setlocal tabstop?`  " 加上verbose可以顯示設定是來至哪裡
   autocmd FileType *
-                  \ if index(['md','markdown',
-                  \           'yml','yaml',
-                  \           'json','json5','jsonc',
-                  \           'toml',
-                  \           'xml','svg','ttx',
-                  \           'gs',
-                  \           'gohtml','gotmpl',
-                  \           'html',
-                  \           'js','javascript','mjs','ts','mts',
-                  \           'css','scss','sass',
-                  \           'lua',
-                  \           'vim',
-                  \           'vue',
-                  \           'sh','zsh',
-                  \           'dart',
-                  \           ], &ft) >= 0
-                  \ |   setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
-                  \ | else
-                  \ |   setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
-                  \ | endif
+        \ if index(['md','markdown',
+        \           'yml','yaml',
+        \           'json','json5','jsonc',
+        \           'toml',
+        \           'xml','svg','ttx',
+        \           'gs',
+        \           'gohtml','gotmpl',
+        \           'html',
+        \           'js','javascript','mjs','ts','mts',
+        \           'css','scss','sass',
+        \           'lua',
+        \           'vim',
+        \           'vue',
+        \           'sh','zsh',
+        \           'dart',
+        \           ], &ft) >= 0
+        \ |   setlocal expandtab shiftwidth=2 softtabstop=2 tabstop=2
+        \ | else
+        \ |   setlocal expandtab shiftwidth=4 softtabstop=4 tabstop=4
+        \ | endif
 
   " `:verbose setlocal expandtab?`
   autocmd FileType go,puml,nsi.nsh,Makefile,mk
-    \ setlocal noexpandtab
+        \ setlocal noexpandtab
 
 augroup END
 
@@ -762,7 +762,7 @@ augroup PluginBookmark
   function! SaveBookmarks()
     let l:dir = fnamemodify(g:bookmarks_file, ':h')
     if !isdirectory(l:dir)
-        call mkdir(l:dir, 'p')
+      call mkdir(l:dir, 'p')
     endif
     call writefile([json_encode(g:bookmarks)], g:bookmarks_file)
   endfunction
@@ -1016,10 +1016,10 @@ augroup PluginGitlist
   endfunction
 
   command! -nargs=* -complete=customlist,s:GitListComplete Gitclist
-         \ call s:GitListToList(v:false, <f-args>)
+        \ call s:GitListToList(v:false, <f-args>)
 
   command! -nargs=* -complete=customlist,s:GitListComplete Gitllist
-         \ call s:GitListToList(v:true, <f-args>)
+        \ call s:GitListToList(v:true, <f-args>)
 
   " 底下也行，是簡易的版本
   "function! s:GitLsFiles(is_loclist, options)
@@ -1100,7 +1100,7 @@ augroup PluginGitlist
           \ 'curwin': v:true,
           \ })
 
-   startinsert
+    startinsert
   endfunction
 
   function! GitFilesExit(job, status) abort
@@ -1338,7 +1338,7 @@ augroup PluginGit
   sign define GitDelete text=│ texthl=DiffDelete
 
   function! UpdateGitSigns()
-  " 1. 取得當前 buffer 的編號與路徑
+    " 1. 取得當前 buffer 的編號與路徑
     let l:buf = bufnr('')
     let l:file = expand('%:p')
 
@@ -1384,16 +1384,16 @@ augroup PluginGit
             " 前一行是 delete → 這是 modified
             " TODO: 目前有的會重複，導致出現sign的問題: `E885: Not possible to change sign GitAdd` 目前先用silent!忽略錯誤
             execute printf('silent! sign place %d group=%s line=%d name=GitChange buffer=%d',
-              \ l:id, l:group, l:current_line, l:buf)
+                  \ l:id, l:group, l:current_line, l:buf)
           else
             execute printf('silent! sign place %d group=%s line=%d name=GitAdd buffer=%d',
-              \ l:id, l:group, l:current_line, l:buf)
+                  \ l:id, l:group, l:current_line, l:buf)
           endif
           let l:prev_was_delete = 0
         else
           " Context line (正常不會太多，因為 -U0)
           execute printf('silent! sign place %d group=%s line=%d name=GitChange buffer=%d',
-            \ l:id, l:group, l:current_line, l:buf)
+                \ l:id, l:group, l:current_line, l:buf)
           let l:prev_was_delete = 0
         endif
         let l:id += 1
@@ -1403,7 +1403,7 @@ augroup PluginGit
         " Deletion
         if !l:prev_was_delete
           execute printf('silent! sign place %d group=%s line=%d name=GitDelete buffer=%d',
-            \ l:id, l:group, l:current_line, l:buf)
+                \ l:id, l:group, l:current_line, l:buf)
           let l:id += 1
         endif
         let l:prev_was_delete = 1
@@ -1575,8 +1575,8 @@ augroup END
 
 
 augroup MarkdownConceal
-    autocmd!
-    autocmd FileType markdown call MarkdownConceal()
+  autocmd!
+  autocmd FileType markdown call MarkdownConceal()
 augroup END
 
 function! MarkdownConceal()
@@ -1702,8 +1702,8 @@ augroup MarkdownHighlight
 
     " Code Block
     syntax region MdCodeBlock
-      \ start=/^\s*```/
-      \ end=/^\s*```/
+          \ start=/^\s*```/
+          \ end=/^\s*```/
 
     hi default MdCodeBlock ctermbg=236 guibg=#37365c
 
