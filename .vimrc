@@ -534,6 +534,39 @@ function! s:HelpOnSelection() range
   execute 'help' selected
 endfunction
 
+" Caution: 一定要補上`filetype plugin indent on`，那麼用 &commentstring " 才會是給正確的
+filetype plugin indent on
+packadd comment
+" function! ToggleComment()
+"   if empty(&commentstring)
+"     echo 'No commentstring defined for this filetype!'
+"     return
+"   endif
+"
+"   let l:comment = split(&commentstring, '%s', 1) " 分割成前後兩部分
+"   let l:leader = l:comment[0]
+"   let l:trailer = get(l:comment, 1, '')
+"
+"   let l:line = getline('.')
+"   let l:trimmed = substitute(l:line, '^\s*', '', '')
+"
+"
+"   " 如果已經被註解，就取消註解
+"   if l:trimmed =~# '^\V' . escape(l:leader, '\')
+"     let l:newline = substitute(l:line, '\V' . escape(l:leader, '\'), '', '')
+"     call setline('.', l:newline)
+"   else
+"     " 否則加上註解
+"     let l:indent = matchstr(l:line, '^\s*')
+"     let l:content = substitute(l:line, '^\s*', '', '')
+"     let l:newline = l:indent . l:leader . l:content . l:trailer
+"     call setline('.', l:newline)
+"   endif
+" endfunction
+"
+" nnoremap gcc :call ToggleComment()<CR>
+" vnoremap gc :call ToggleComment()<CR>
+
 
 augroup Formatting
   autocmd!
