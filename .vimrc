@@ -769,3 +769,159 @@ augroup PluginHighlightSpecial
   autocmd ColorScheme * call HighlightSpecialKeywords()
 
 augroup END
+
+
+" ============================================================
+" Gitclist / Gitllist
+"
+" 將 git ls-files 結果放到:
+"   Gitclist -> quickfix
+"   Gitllist -> location list
+"
+" 支援:
+"   --no-cd
+"   -a ACTION
+"   --action ACTION
+"
+" ACTION:
+"   空白 = 新建
+"   a    = append
+"   r    = replace
+"   u    = update
+"   f    = free all
+" ============================================================
+augroup PluginGitlist
+  autocmd!
+  function! s:GitListToList(is_loclist, ...) abort
+    let options = {
+          \ 'action': ' ',
+          \ 'cd': v:true,
+          \ }
+
+    let args = []
+
+    let i = 0
+    while i < len(a:000)
+      let arg = a:000[i]
+
+      if arg ==# '--no-cd'
+        let options.cd = v:false
+
+      elseif arg ==# '-a' || arg ==# '--action'
+        let i += 1
+
+        if i < len(a:000)
+          let options.action = a:000[i]
+        endif
+
+      else
+        call add(args, arg)
+      endif
+
+      let i += 1
+    endwhile
+
+    " 切換到目前檔案所在目錄
+    if options.cd
+      let l:old_cwd = getcwd()
+
+      if expand('%') !=# ''
+        execute 'cd' fnameescape(expand('%:p:h'))
+      endif
+
+      let l:git_root = substitute(
+            \ system('git rev-parse --show-toplevel'),
+            \ '\n\+$',
+            \ '',
+            \ '')
+
+      if v:shell_error == 0
+        execute 'cd' fnameescape(l:git_root)
+      endif
+    endif
+
+    let l:cmd = 'git ls-files --full-name'
+
+    if !empty(args)
+      let l:cmd .= ' ' . join(args, ' ')
+    endif
+
+    let l:lines = systemlist(l:cmd)
+
+    if options.cd
+      execute 'cd' fnameescape(l:old_cwd)
+    endif
+
+    if a:is_loclist
+      call setloclist(
+            \ 0,
+            \ [],
+            \ options.action,
+            \ {
+            \  'title': l:cmd,
+            \  'lines': l:lines,
+            \  'efm': '%f',
+            \ })
+
+      lopen
+    else
+      call setqflist(
+            \ [],
+            \ options.action,
+            \ {
+            \  'title': l:cmd,
+            \  'lines': l:lines,
+            \  'efm': '%f',
+            \ })
+
+      copen
+    endif
+  endfunction
+
+  function! s:GitListComplete(A, L, P) abort
+    let l:cmdline = a:L
+
+    " 補 action 參數
+    if l:cmdline =~# '\v(--action|-a)\s+\S*$'
+      return filter(
+            \ ['a', 'r', 'u', 'f'],
+            \ 'v:val =~ "^" . a:A'
+            \ )
+    endif
+
+    " 補 option
+    if a:A =~# '^-'
+      return filter(
+            \ [
+            \ '--no-cd',
+            \ '--action',
+            \ '-a',
+            \ ],
+            \ 'v:val =~ "^" . a:A'
+            \ )
+    endif
+
+    " 常用 git pathspec
+    return filter(
+          \ [
+          \ "'*.md'",
+          \ "'*.lua'",
+          \ "'*.vim'",
+          \ "'*keymap*'",
+          \ "':!:node_modules'",
+          \ "':!:vendor'",
+          \ "':!:dist'",
+          \ "':!:build'",
+          \ "':!:*temp*'",
+          \ "':!:*.min.js'",
+          \ ],
+          \ 'v:val =~ "^" . a:A'
+          \ )
+  endfunction
+
+  command! -nargs=* -complete=customlist,s:GitListComplete Gitclist
+         \ call s:GitListToList(v:false, <f-args>)
+
+  command! -nargs=* -complete=customlist,s:GitListComplete Gitllist
+         \ call s:GitListToList(v:true, <f-args>)
+augroup END
