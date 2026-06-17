@@ -1394,10 +1394,13 @@ function! MarkdownConceal()
   syntax match MdLinkClose '\](.\{-})' conceal contained
 
 
-  " Header Mark
-  "可用，但是顏色就會沒有了
-  "syntax match MdH1Mark '^# ' conceal
-  "syntax match MdH2Mark '^## ' conceal
+  " Header Mark (Important: 當一個syntax可能也會有其它的syntax相衝，要用contains才會有多個效果)
+  syntax match MdH1Mark '^# '      conceal contained cchar=󰲡
+  syntax match MdH2Mark '^## '     conceal contained cchar=󰲣
+  syntax match MdH3Mark '^### '    conceal contained cchar=󰲥
+  syntax match MdH4Mark '^#### '   conceal contained cchar=󰲧
+  syntax match MdH5Mark '^##### '  conceal contained cchar=󰲩
+  syntax match MdH6Mark '^###### ' conceal contained cchar=󰲫
 
 endfunction
 
@@ -1409,38 +1412,38 @@ augroup MarkdownHighlight
   autocmd FileType markdown call MarkdownHighlight()
   function! MarkdownHighlight()
     "--- Level 1: 主標題 (紅色系) ---
-    syntax match MdH1 /^# .*$/
-    "syntax match MdH1 /^# .\{0,120}\.*$/
-    hi default link MdH1 Normal
+    "syntax match MdH1 /^# .*$/
+    syntax match MdH1 /^# .\{0,120}\.*$/  contains=MdH1Mark
+    "hi default link MdH1 Normal
     "hi MdH1 gui=bold guifg=#ff5f87
     hi MdH1 gui=bold guifg=#ff7f69 guibg=#3e2b2f
 
     " --- Level 2: 副標題 (藍色系) ---
-    syntax match MdH2 /^## .\{0,120}\.*$/
-    hi default link MdH2 Normal
+    syntax match MdH2 /^## .\{0,120}\.*$/ contains=MdH2Mark
+    "hi default link MdH2 Normal
     "hi MdH2 gui=bold guifg=#50fa7b
     hi MdH2 gui=bold guifg=#4fa3d1 guibg=#2c4556
 
     " --- Level 3: 章節標題 (橘色系) ---
-    syntax match MdH3 /^### .\{0,120}\.*$/
-    hi default link MdH3 Normal
+    syntax match MdH3 /^### .\{0,120}\.*$/ contains=MdH3Mark
+    "hi default link MdH3 Normal
     "hi MdH3 gui=bold guifg=#ffcb6b
     hi MdH3 gui=bold guifg=#57a68d guibg=#3a4e3c
 
     " --- Level 4: 子標題 (紫色系) ---
-    syntax match MdH4 /^#### .\{0,120}\.*$/
-    hi default link MdH4 Normal
+    syntax match MdH4 /^#### .\{0,120}\.*$/ contains=MdH4Mark
+    "hi default link MdH4 Normal
     "hi MdH4 gui=bold guifg=#c678dd
     hi MdH4 gui=bold guifg=#9b72aa guibg=#3a2e44
 
     " --- Level 5 & 6: 細節標題 (淡紫/粉紅系) ---
-    syntax match MdH5 /^##### .\{0,120}\.*$/
-    hi default link MdH5 Normal
+    syntax match MdH5 /^##### .\{0,120}\.*$/ contains=MdH5Mark
+    "hi default link MdH5 Normal
     "hi MdH5 gui=bold guifg=#ff79c6
     hi MdH5 gui=bold guifg=#c0c0c0 guibg=#4a3b5e
 
-    syntax match MdH6 /^###### .\{0,120}\.*$/
-    hi default link MdH6 Normal
+    syntax match MdH6 /^###### .\{0,120}\.*$/ contains=MdH6Mark
+    "hi default link MdH6 Normal
     "hi MdH6 gui=bold guifg=#b16286
     hi MdH6 gui=bold guifg=#b16286 guibg=#3a2e3c
 
