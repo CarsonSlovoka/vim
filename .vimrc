@@ -316,6 +316,18 @@ nnoremap <A-j> <C-w>j<CR>
 nnoremap <A-k> <C-w>k<CR>
 nnoremap <A-l> <C-w>l<CR>
 
+" Move the current window to be at the very left, bottom, top, right
+" Alt + Shift + {h,j,k,l}
+" TODO: 當前的這些作法都不行
+" nnoremap <M-H> <C-w>H<CR>
+" nnoremap <M-J> <C-w>J<CR>
+" nnoremap <M-K> <C-w>K<CR>
+" nnoremap <M-L> <C-w>L<CR>
+" nnoremap <M-S-h> <C-w>H<CR>
+" nnoremap <M-S-j> <C-w>J<CR>
+" nnoremap <M-S-k> <C-w>K<CR>
+" nnoremap <M-S-l> <C-w>L<CR>
+
 " clist, llist
 " nnoremap [q :cprevious<CR>   " 這種寫法對有用到v:count1會不能用
 nnoremap <silent> [q :<C-u>execute v:count1 . "cprevious"<CR>
