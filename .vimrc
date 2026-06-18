@@ -2216,7 +2216,8 @@ function! InputMethodEnable() abort
     if executable('sim')
       " 這裡依照你的習慣修改
       " 例如切回嘸蝦米
-      call system('sim net.openvanilla.boshiamy')
+      " call system('sim net.openvanilla.boshiamy &> /dev/null')  " Warn: " 這樣還是可能會出現`Press ENTER or type command to continue` 加上silent來避免
+      silent call system('sim net.openvanilla.boshiamy &> /dev/null')
     endif
   endif
 endfunction
@@ -2237,7 +2238,7 @@ function! InputMethodDisable() abort
 
   elseif s:IsMac()
     if executable('sim')
-      call system('sim com.apple.keylayout.ABC')
+      silent call system('sim com.apple.keylayout.ABC  &> /dev/null')
     endif
   endif
 endfunction
