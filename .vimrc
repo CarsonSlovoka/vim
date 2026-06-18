@@ -319,6 +319,9 @@ nnoremap <silent> ]q :<C-u>execute v:count1 . "cnext"<CR>
 nnoremap <silent> [l :<C-u>execute v:count1 . "lprevious"<CR>
 nnoremap <silent> ]l :<C-u>execute v:count1 . "lnext"<CR>
 
+" 正常在visual下，於反白處貼上內容後，下一次再貼會是之前反白處的內容，為了避免如此. 先用黑洞移除(不會寫入到")再貼上即可
+vnoremap p "_dP
+
 " insert link
 nnoremap <leader><leader>l  ciW[<C-r>"]()<Left>
 
