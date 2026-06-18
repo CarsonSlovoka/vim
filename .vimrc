@@ -674,7 +674,6 @@ augroup YankHighlight
 augroup END
 
 function! HighlightYank()
-  " Tip: 此版本只可適用: yw, yiw, yy  (V下的多列不行(單列可))
 
   let l:pos = getpos("'[")
   let l:end = getpos("']")
@@ -683,12 +682,32 @@ function! HighlightYank()
     return
   endif
 
-  let l:id = matchaddpos(
+  let l:bufnr = bufnr()
+  let l:winid = win_getid()
+
+  let w:yank_match_id  = matchaddpos(
         \ 'IncSearch',
         \ [[l:pos[1], l:pos[2], l:end[2]-l:pos[2]+1]]
         \ )
+  let l:yank_match_id = w:yank_match_id  " 避免中突觸發了Leave的事件，導致w:yank_match_id已經unlet了
 
-  call timer_start(700, {-> matchdelete(l:id)})
+  " call timer_start(700, {-> matchdelete(l:id)})
+  " call timer_start(700, {-> s:SafeMatchDelete(w:yank_match_id, l:bufnr, l:winid)})
+  call timer_start(700, {-> s:SafeMatchDelete(l:yank_match_id, l:bufnr, l:winid)})
+endfunction
+
+function! s:SafeMatchDelete(matchid, bufnr, winid)
+    if bufnr() == a:bufnr && win_getid() == a:winid
+        silent! call matchdelete(a:matchid)
+    endif
+endfunction
+
+autocmd BufLeave,WinLeave,TabLeave * call ClearYankHighlight()
+function! ClearYankHighlight()
+    if exists('w:yank_match_id')
+        silent! call matchdelete(w:yank_match_id)
+        unlet! w:yank_match_id
+    endif
 endfunction
 
 
