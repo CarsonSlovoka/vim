@@ -319,6 +319,8 @@ nnoremap <silent> ]q :<C-u>execute v:count1 . "cnext"<CR>
 nnoremap <silent> [l :<C-u>execute v:count1 . "lprevious"<CR>
 nnoremap <silent> ]l :<C-u>execute v:count1 . "lnext"<CR>
 
+" insert link
+nnoremap <leader><leader>l  ciW[<C-r>"]()<Left>
 
 " 在當前的目錄開啟term
 " nnoremap <leader><leader>t :term<CR>
