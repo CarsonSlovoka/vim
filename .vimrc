@@ -2003,3 +2003,81 @@ endfunction
 function! PrevTodo()
   call search('^\s*-\s\[[^xXvV]\]', 'bW')
 endfunction
+
+
+" ==== PluginPreviewImg (gi) ====
+augroup PluginPreviewImg
+  autocmd!
+  " Caution: 不要倚靠 mode() 在n, v下都是得到n
+  nnoremap gi :call PreviewImage('n')<CR>
+  xnoremap gi y:call PreviewImage('v')<CR>
+augroup END
+
+function! PreviewImage(mode) abort
+  " 1. 判斷作業系統
+  let l:os = system('uname -s 2>/dev/null')->trim()
+  " echohl Label | echo "DEBUG: OS: " . l:os | echohl None
+  let l:exe = ''
+
+  if l:os ==# 'Linux'
+    for cmd in ['swayimg', 'chafa']
+      if executable(cmd)
+        let l:exe = cmd
+        break
+      endif
+    endfor
+
+    if empty(l:exe)
+      echohl WarningMsg
+      echo "preview tool not found."
+      echo "sudo apt install swayimg"
+      echo "or"
+      echo "sudo apt install chafa"
+      echohl None
+      return
+    endif
+
+  elseif l:os ==# 'Darwin'
+    let l:exe = 'open -a Preview'
+  else
+    echohl ErrorMsg
+    echo "❌ unsupported platform: " . l:os
+    echohl None
+    return
+  endif
+
+  " 2. 切換到目前檔案所在目錄
+  lcd %:h
+
+  " 3. 取得圖片路徑
+  let l:img_path = ''
+
+  let l:img_path = ''
+  if a:mode ==# 'n'
+    normal! viby
+    let l:img_path = getreg('"')
+  else
+    " Tip: 利用 gv 選擇到之前的選取範圍 (如果在call之前已經做了y, 那麼也可以不用再用gv多此一舉)
+    " normal! gvy
+    " let l:img_path = s:GetVisualSelection()
+    let l:img_path = getreg('"')
+  endif
+
+  " 清理路徑（去除前後空白與換行）
+  let l:img_path = trim(l:img_path)
+
+  if empty(l:img_path)
+    echohl ErrorMsg | echo "No image path found!" | echohl None
+    return
+  endif
+
+  " 4. 執行預覽指令
+  if l:exe !=# 'chafa'
+    " swayimg / open -a Preview
+    silent! call system(l:exe . ' ' . shellescape(l:img_path) . ' &')
+  else
+    " 使用自己定義的 :Chafa 指令: 尚未實作
+    " execute 'Chafa' l:img_path
+  endif
+endfunction
+
