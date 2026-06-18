@@ -1853,6 +1853,24 @@ augroup MarkdownHighlight
   endfunction
 augroup END
 
+augroup MarkdownEdit
+  autocmd!
+  " bold
+  autocmd FileType markdown,txt nnoremap <buffer> <leader>b         ciw**<C-r>"**<ESC>
+  " italic
+  autocmd FileType markdown,txt nnoremap <buffer> <leader>i         ciw*<C-r>"*<ESC>
+  " bold
+  autocmd FileType markdown,txt vnoremap <buffer> <leader>b         c**<C-r>"**<ESC>
+  " italic
+  autocmd FileType markdown,txt vnoremap <buffer> <leader>i         c*<C-r>"*<ESC>
+  " strokethrough
+  autocmd FileType markdown,txt vnoremap <buffer> <leader>dw        c~~<C-r>"~~<ESC>
+  autocmd FileType markdown,txt vnoremap <buffer> <leader>~         c~~<C-r>"~~<ESC>
+
+  " code block
+  autocmd FileType markdown,txt nnoremap <buffer> <leader><leader>` i```<CR>```<C-o>k<End>
+augroup END
+
 
 " ============================================================
 " Rg Command
