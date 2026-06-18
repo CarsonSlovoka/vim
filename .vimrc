@@ -2148,3 +2148,88 @@ function! PreviewImage(mode) abort
   endif
 endfunction
 
+
+" ==== PluginSim set input method ====
+" 方便在適當的模式下，都預先將輸入法切換回英文
+" ====
+augroup PluginSim
+  autocmd!
+  if exists('g:loaded_input_method')
+    finish
+  endif
+  let g:loaded_input_method = 1
+
+  autocmd InsertEnter  *      call InputMethodEnable()
+  autocmd InsertLeave  *      call InputMethodDisable()
+
+  " vim 沒有以下的這些event, nvim才有
+  " autocmd TermOpen       *  call InputMethodDisable()
+  " autocmd TermEnter      *  call InputMethodEnable()
+  " autocmd TermLeave      *  call InputMethodDisable()
+  autocmd TerminalOpen     *  call InputMethodDisable()
+  " autocmd TerminalEnter  *  call InputMethodEnable()
+  " autocmd TerminalLeave  *  call InputMethodDisable()
+
+  autocmd CmdlineEnter [/?]   call InputMethodEnable()
+  autocmd CmdlineLeave [/?]   call InputMethodDisable()
+  autocmd CmdlineEnter :      call InputMethodDisable()
+augroup END
+
+
+"---------------------------------------
+" 平台判斷
+"---------------------------------------
+
+function! s:IsMac() abort
+  return has('macunix')
+endfunction
+
+function! s:IsLinux() abort
+  return has('unix') && !has('macunix')
+endfunction
+
+"---------------------------------------
+" 啟用輸入法
+"---------------------------------------
+
+function! InputMethodEnable() abort
+  if s:IsLinux()
+    if executable('fcitx5-remote')
+      let l:state = str2nr(system('fcitx5-remote'))
+
+      if l:state != 2
+        call system('fcitx5-remote -s keyboard-us')
+      endif
+    endif
+
+  elseif s:IsMac()
+    " Tip: sim 執行檔請參考此專案來取得: https://github.com/CarsonSlovoka/sim
+    if executable('sim')
+      " 這裡依照你的習慣修改
+      " 例如切回嘸蝦米
+      call system('sim net.openvanilla.boshiamy')
+    endif
+  endif
+endfunction
+
+"---------------------------------------
+" 關閉輸入法
+"---------------------------------------
+
+function! InputMethodDisable() abort
+  if s:IsLinux()
+    if executable('fcitx5-remote')
+      let l:state = str2nr(system('fcitx5-remote'))
+
+      if l:state == 2
+        call system('fcitx5-remote -c')
+      endif
+    endif
+
+  elseif s:IsMac()
+    if executable('sim')
+      call system('sim com.apple.keylayout.ABC')
+    endif
+  endif
+endfunction
+
