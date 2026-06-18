@@ -1534,6 +1534,73 @@ augroup PluginGit
   nnoremap <expr> [c &diff ? '[c' : ':call GitGutterJump("prev")<CR>'
 augroup END
 
+" ==== PluginGitlog ====
+augroup PluginGitlog
+  autocmd!
+  command! -range -nargs=* Gitlog call Gitlog(<range>, <line1>, <line2>, <q-args>)
+augroup END
+
+function! Gitlog(range, line1, line2, args) abort
+  " help
+  if a:args ==# '-h'
+    echo 'Gitlog help'
+    echo ':Gitlog -2'
+    echo ':Gitlog -2 -p'
+    echo ':Gitlog -2 -p -U3'
+    echo ':Gitlog -2 --name-only'
+    return
+  endif
+
+  execute 'lcd' expand('%:p:h')
+
+  " 是否在 git repo
+  let git_root = substitute(system('git rev-parse --show-toplevel'), '\n$', '', '')
+  if v:shell_error != 0
+    echoerr 'Not in a git repository'
+    return
+  endif
+
+  " 是否有選取範圍
+  let line_range = ''
+
+  if a:range > 0
+    let line_range = printf(
+          \ '-L%d,%d:',
+          \ a:line1,
+          \ a:line2)
+  endif
+
+
+  if a:line1 != a:line2
+    let line_range = printf('-L%d,%d:', a:line1, a:line2)
+  endif
+
+  let filename = expand('%:t')
+
+  let cmd = printf(
+        \ 'git log %s %s%s',
+        \ a:args,
+        \ line_range,
+        \ filename)
+
+  " --name-only 不可加 filename
+  if a:args =~# '--name-only'
+    let cmd = printf('git log %s', a:args)
+  endif
+
+  " 開 terminal
+  topleft new
+  terminal ++curwin
+
+  call term_sendkeys(
+        \ bufnr('%'),
+        \ "echo '可以使用 <C-W>T 將視窗移動到新的 Tab'\<CR>")
+
+  call term_sendkeys(
+        \ bufnr('%'),
+        \ cmd . "\<CR>")
+endfunction
+
 " ============================================================
 " Markdown
 " ============================================================
