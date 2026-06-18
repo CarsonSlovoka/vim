@@ -7,6 +7,10 @@ if has("syntax") " vi --version | grep syntax " 要是+syntax才能用
   "set foldmethod=syntax
 endif
 
+" Tip: 如果要debug可以這樣做
+" :set verbosefile=~/vim.log      " 預設不寫檔, 但是這樣會很亂, 會一直被echo影響
+" :set verbose=9
+
 set fileencodings=ucs-bom,utf-8,default,cp950,big5,gbk,binary
 set fileformat=unix
 
