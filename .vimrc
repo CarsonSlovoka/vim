@@ -264,6 +264,7 @@ hi Delimiter        guifg=#e6edf3
 
 hi Underlined       guifg=#58a6ff gui=underline
 hi Error            guifg=#f85149
+hi default link     ErrorMsg      Error
 hi Todo             guifg=#0d1117 guibg=#d29922 gui=bold
 
 " Diff
@@ -649,6 +650,7 @@ augroup Formatting
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
   autocmd FileType go          command! -buffer        FmtGo     %!gofmt
+  autocmd FileType python      command! -buffer        FmtPython call FmtPython()
 
   autocmd FileType xml         command! -buffer        FmtXml    %!xmlstarlet fo
 
@@ -680,6 +682,23 @@ augroup Formatting
     call setline(1, split(l:output, "\n"))
   endfunction
 augroup END
+
+function! FmtPython() abort
+  for l:exe in ['isort', 'black']
+    if !executable(exe)
+      " 很奇怪，前面一定要給一次，不然首次使用不會看到訊息
+      echon ' '
+      echohl Error | echo printf('`%s` not found. try `pip install %s`', l:exe, l:exe)  | echohl None
+      return
+    endif
+  endfor
+  for l:exe in ['isort', 'black']
+    execute "%!" . l:exe . " " . expand("%")
+  endfor
+
+  " reload (如果沒有用e! 會被尋問是否要重新載入)
+  execute 'e!'
+endfunction
 
 
 " 🟧 autocmd
