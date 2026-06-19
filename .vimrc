@@ -718,17 +718,17 @@ function! HighlightYank()
 endfunction
 
 function! s:SafeMatchDelete(matchid, bufnr, winid)
-    if bufnr() == a:bufnr && win_getid() == a:winid
-        silent! call matchdelete(a:matchid)
-    endif
+  if bufnr() == a:bufnr && win_getid() == a:winid
+    silent! call matchdelete(a:matchid)
+  endif
 endfunction
 
 autocmd BufLeave,WinLeave,TabLeave * call ClearYankHighlight()
 function! ClearYankHighlight()
-    if exists('w:yank_match_id')
-        silent! call matchdelete(w:yank_match_id)
-        unlet! w:yank_match_id
-    endif
+  if exists('w:yank_match_id')
+    silent! call matchdelete(w:yank_match_id)
+    unlet! w:yank_match_id
+  endif
 endfunction
 
 
