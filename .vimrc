@@ -645,14 +645,14 @@ augroup Formatting
   "command! FmtJson %!jq .
   "command! -range FmtCurl s/ -/ \\\r -/g
   " -buffer只有當前的該buffer才會有此指令能用
-  autocmd FileType json        command! -buffer        Fmt       %!jq .
-  autocmd FileType sh,bash,zsh command! -buffer -range Fmt       s/ -/ \\\r -/g
+  autocmd FileType json        command! -buffer        Fmt       up | %!jq .
+  autocmd FileType sh,bash,zsh command! -buffer -range Fmt       up | s/ -/ \\\r -/g
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
-  autocmd FileType go          command! -buffer        Fmt       %!gofmt
+  autocmd FileType go          command! -buffer        Fmt       up | %!gofmt
   autocmd FileType python      command! -buffer        Fmt       call FmtPython()
 
-  autocmd FileType xml         command! -buffer        Fmt       %!xmlstarlet fo
+  autocmd FileType xml         command! -buffer        Fmt       up | %!xmlstarlet fo
 
   "autocmd FileType rust       command! -buffer        Fmt
   "    \ update | silent %!cargo fmt
@@ -684,6 +684,7 @@ augroup Formatting
 augroup END
 
 function! FmtPython() abort
+  update
   for l:exe in ['isort', 'black']
     if !executable(exe)
       " 很奇怪，前面一定要給一次，不然首次使用不會看到訊息
