@@ -1239,7 +1239,7 @@ augroup END
 " ==========================================================
 augroup PluginCopyPath
 
-  function! s:CopyPathMenu() abort
+  function! s:CopyPathMenu(mode) abort
     let abs_path = expand('%:p')
     let filename = expand('%:t')
 
@@ -1282,25 +1282,21 @@ augroup PluginCopyPath
       if !empty(sha_result)
         let sha = sha_result[0]
 
-        " visual mode line range
-        let start_line = line('v')
-        let end_line   = line('.')
-
-        if start_line > end_line
-          let tmp = start_line
-          let start_line = end_line
-          let end_line = tmp
+        let line_range = ''
+        if a:mode ==# 'v'
+          let start_line = getpos("'<")[1]
+          let end_line = getpos("'>")[1]
+          let line_range = printf('-r %d:%d', start_line, end_line)
         endif
-
         for cur_sha in [sha, strpart(sha, 0, 8)]
+          " 'git show -p %s:%s | bat -l %s -P -r %d:%d',
           let git_show_cmd =
                 \ printf(
-                \ 'git show -p %s:%s | bat -l %s -P -r %d:%d',
+                \ 'git show -p %s:%s | bat -l %s -P %s',
                 \ cur_sha,
                 \ git_rel_path,
                 \ &filetype,
-                \ start_line,
-                \ end_line
+                \ line_range,
                 \ )
 
           call add(git_show_paths, git_show_cmd)
@@ -1333,14 +1329,10 @@ augroup PluginCopyPath
 
     let @+ = selected
 
-    echo '✅ Copied: ' . selected
+    " echo '✅ Copied: ' . selected
   endfunction
-
-  " Normal mode
-  nnoremap <silent> <leader>Y :call <SID>CopyPathMenu()<CR>
-
-  " Visual mode
-  xnoremap <silent> <leader>Y :<C-U>call <SID>CopyPathMenu()<CR>
+  nnoremap <silent> <leader>Y :call <SID>CopyPathMenu('n')<CR>
+  xnoremap <silent> <leader>Y :<C-U>call <SID>CopyPathMenu('v')<CR>
 
 augroup END
 
