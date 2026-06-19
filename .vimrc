@@ -698,7 +698,7 @@ function! FmtPython() abort
   endfor
 
   " reload (如果沒有用e! 會被尋問是否要重新載入)
-  execute 'e!'
+  e!
 endfunction
 
 
