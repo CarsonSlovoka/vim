@@ -1712,7 +1712,8 @@ augroup PluginMarkdownPreview
     nnoremap <buffer> <Tab> za
   endfunction
 
-  autocmd FileType markdown command! -buffer MdTOC call GenerateMarkdownTOC()
+  autocmd FileType markdown,txt command! -buffer MdTOC call GenerateMarkdownTOC()
+  autocmd FileType markdown,txt nnoremap <buffer> <leader>wt  :MdTOC<CR>
   "function! GenerateMarkdownTOC()
   "  silent! execute 'lvimgrep /^#\+\s\+/ %'
   "  lopen
