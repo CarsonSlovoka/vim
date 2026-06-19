@@ -645,18 +645,18 @@ augroup Formatting
   "command! FmtJson %!jq .
   "command! -range FmtCurl s/ -/ \\\r -/g
   " -buffer只有當前的該buffer才會有此指令能用
-  autocmd FileType json        command! -buffer        FmtJson   %!jq .
-  autocmd FileType sh,bash,zsh command! -buffer -range FmtCurl   s/ -/ \\\r -/g
+  autocmd FileType json        command! -buffer        Fmt       %!jq .
+  autocmd FileType sh,bash,zsh command! -buffer -range Fmt       s/ -/ \\\r -/g
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
-  autocmd FileType go          command! -buffer        FmtGo     %!gofmt
-  autocmd FileType python      command! -buffer        FmtPython call FmtPython()
+  autocmd FileType go          command! -buffer        Fmt       %!gofmt
+  autocmd FileType python      command! -buffer        Fmt       call FmtPython()
 
-  autocmd FileType xml         command! -buffer        FmtXml    %!xmlstarlet fo
+  autocmd FileType xml         command! -buffer        Fmt       %!xmlstarlet fo
 
-  "autocmd FileType rust       command! -buffer        FmtRs
+  "autocmd FileType rust       command! -buffer        Fmt
   "    \ update | silent %!cargo fmt
-  autocmd FileType rust        command! -buffer        FmtRs     call FmtRust()
+  autocmd FileType rust        command! -buffer        Fmt       call FmtRust()
   function! FmtRust() abort
     update
 
