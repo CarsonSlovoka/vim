@@ -70,6 +70,7 @@ let &t_EI = "\<Esc>[2 q"
 let &t_SR = "\<Esc>[4 q"
 
 " 🟧 tabline
+" Note: tabline 不能使用<SID>
 set tabline=%!MyTabLine()
 function! MyTabLine()
   let s = ''
@@ -125,6 +126,7 @@ set statusline+=%w                      " Preview window flag [Preview]
 
 set statusline+=%=
 " set statusline+=\ %{searchcount().current}/%{searchcount().total}  " 好處是離開search時還能看到, 甚致曉得到當前第幾個, 但不用的時候就很礙眼
+" Note: 這邊的函數不能用SID, 也就是s: 的函數
 set statusline+=\ %=%{ChecklistStatus()}
 
 " 4. Divider: everything after this character moves to the right side
@@ -455,7 +457,7 @@ augroup Digraphs
 augroup END
 
 " 🟧 command
-function! Inspect()
+function! s:Inspect()
   let l:pos = [line('.'), col('.')]
   let l:synstack = synstack(l:pos[0], l:pos[1])
 
@@ -568,7 +570,7 @@ function! Inspect()
   endif
 endfunction
 " command! Inspect echo synIDattr(synID(line("."),col("."),1),"name")   " 👈 這可行，但比較簡單
-command! Inspect call Inspect()
+command! Inspect call s:Inspect()
 
 " command! NewTmp enew | setlocal buftype=nofile noswapfile
 command! -nargs=? -complete=filetype NewTmp call NewTmp(<q-args>)
@@ -651,14 +653,14 @@ augroup Formatting
 
   "autocmd FileType go nnoremap <buffer> <leader>f :%!gofmt<CR>
   autocmd FileType go          command! -buffer        Fmt       up | %!gofmt
-  autocmd FileType python      command! -buffer        Fmt       call FmtPython()
+  autocmd FileType python      command! -buffer        Fmt       call s:FmtPython()
 
   autocmd FileType xml         command! -buffer        Fmt       up | %!xmlstarlet fo
 
   "autocmd FileType rust       command! -buffer        Fmt
   "    \ update | silent %!cargo fmt
-  autocmd FileType rust        command! -buffer        Fmt       call FmtRust()
-  function! FmtRust() abort
+  autocmd FileType rust        command! -buffer        Fmt       call s:FmtRust()
+  function! s:FmtRust() abort
     update
 
     " 使用 rustfmt --emit=stdout 來 filter
@@ -684,7 +686,7 @@ augroup Formatting
   endfunction
 augroup END
 
-function! FmtPython() abort
+function! s:FmtPython() abort
   update
   for l:exe in ['isort', 'black']
     if !executable(exe)
@@ -712,10 +714,10 @@ endfunction
 
 augroup YankHighlight
   autocmd!
-  autocmd TextYankPost * call HighlightYank()
+  autocmd TextYankPost * call s:HighlightYank()
 augroup END
 
-function! HighlightYank()
+function! s:HighlightYank()
 
   let l:pos = getpos("'[")
   let l:end = getpos("']")
@@ -744,8 +746,8 @@ function! s:SafeMatchDelete(matchid, bufnr, winid)
   endif
 endfunction
 
-autocmd BufLeave,WinLeave,TabLeave * call ClearYankHighlight()
-function! ClearYankHighlight()
+autocmd BufLeave,WinLeave,TabLeave * call s:ClearYankHighlight()
+function! s:ClearYankHighlight()
   if exists('w:yank_match_id')
     silent! call matchdelete(w:yank_match_id)
     unlet! w:yank_match_id
@@ -806,25 +808,25 @@ augroup PluginBookmark
   let g:bookmarks_file = expand('~/.vim/bookmarks.json')
 
   " 讀取書籤
-  function! LoadBookmarks()
+  function! s:LoadBookmarks()
     if filereadable(g:bookmarks_file)
       let g:bookmarks = json_decode(join(readfile(g:bookmarks_file), ''))
     else
       let g:bookmarks = {}
     endif
   endfunction
-  call LoadBookmarks()
+  call s:LoadBookmarks()
 
   " 設定書籤 (:BkAdd Foo)
-  command! -nargs=1 -complete=customlist,BookmarkComplete BkAdd call SetBookmark(<q-args>)
-  function! SetBookmark(name)
+  command! -nargs=1 -complete=customlist,s:BookmarkComplete BkAdd call s:SetBookmark(<q-args>)
+  function! s:SetBookmark(name)
     let g:bookmarks[a:name] = [expand('%:p'), getpos('.')]
     echo "Bookmarked: " . a:name
   endfunction
 
   " 刪除書籤( :BkRm Foo)
-  command! -nargs=1 -complete=customlist,BookmarkComplete BkRm call RemoveBookmark(<q-args>)
-  function! RemoveBookmark(name)
+  command! -nargs=1 -complete=customlist,s:BookmarkComplete BkRm call s:RemoveBookmark(<q-args>)
+  function! s:RemoveBookmark(name)
     if has_key(g:bookmarks, a:name)
       call remove(g:bookmarks, a:name)
       echo "Removed bookmark: " . a:name
@@ -834,8 +836,8 @@ augroup PluginBookmark
   endfunction
 
   " 跳到書籤 (:GotoBookmark Foo)
-  command! -nargs=1 -complete=customlist,BookmarkComplete GotoBookmark call GotoBookmark(<q-args>)
-  function! GotoBookmark(name)
+  command! -nargs=1 -complete=customlist,s:BookmarkComplete GotoBookmark call s:GotoBookmark(<q-args>)
+  function! s:GotoBookmark(name)
     if has_key(g:bookmarks, a:name)
       let [file, pos] = g:bookmarks[a:name]
       exec 'edit ' . file
@@ -848,7 +850,7 @@ augroup PluginBookmark
   nnoremap <leader>bk :GotoBookmark<Space>
 
   " 補全功能
-  function! BookmarkComplete(A, L, P)
+  function! s:BookmarkComplete(A, L, P)
     if empty(a:A)
       return keys(g:bookmarks)
     endif
@@ -861,8 +863,8 @@ augroup PluginBookmark
   "set viminfo+=!  " 👈 沒用，還是沒辦法保存
 
   " 儲存書籤
-  command! BkSave call SaveBookmarks()
-  function! SaveBookmarks()
+  command! BkSave call s:SaveBookmarks()
+  function! s:SaveBookmarks()
     let l:dir = fnamemodify(g:bookmarks_file, ':h')
     if !isdirectory(l:dir)
       call mkdir(l:dir, 'p')
@@ -870,7 +872,7 @@ augroup PluginBookmark
     call writefile([json_encode(g:bookmarks)], g:bookmarks_file)
   endfunction
 
-  autocmd VimLeave * call SaveBookmarks()
+  autocmd VimLeave * call s:SaveBookmarks()
 augroup END
 
 augroup PluginHighlightSpecial
@@ -879,7 +881,7 @@ augroup PluginHighlightSpecial
   " 保存目前所有 match id
   let s:match_ids = []
 
-  function! HighlightSpecialKeywords() abort
+  function! s:HighlightSpecialKeywords() abort
     "--------------------------------------------------
     " 清除舊的 match
     "--------------------------------------------------
@@ -961,10 +963,10 @@ augroup PluginHighlightSpecial
           \ ))
   endfunction
 
-  autocmd BufReadPost,BufNewFile * call HighlightSpecialKeywords()
+  autocmd BufReadPost,BufNewFile * call s:HighlightSpecialKeywords()
 
   " 如果 colorscheme 改變，重新套用
-  autocmd ColorScheme * call HighlightSpecialKeywords()
+  autocmd ColorScheme * call s:HighlightSpecialKeywords()
 
 augroup END
 
@@ -1156,9 +1158,9 @@ augroup PluginGitlist
   "command! Gitllist call s:GitLsFiles(v:true, {})
 
 
-  command! -nargs=* Gitfiles call GitFiles(<f-args>)
+  command! -nargs=* Gitfiles call s:GitFiles(<f-args>)
   " TODO: 當前還不能自動跳轉，要用gf才可以
-  function! GitFiles(...) abort
+  function! s:GitFiles(...) abort
     " 切換到目前檔案所在目錄
     execute 'lcd' expand('%:p:h')
 
@@ -1199,14 +1201,14 @@ augroup PluginGitlist
     let s:gitfiles_buf = bufnr('%')
 
     call term_start([&shell, &shellcmdflag, cmd], {
-          \ 'exit_cb': function('GitFilesExit'),
+          \ 'exit_cb': function('s:GitFilesExit'),
           \ 'curwin': v:true,
           \ })
 
     startinsert
   endfunction
 
-  function! GitFilesExit(job, status) abort
+  function! s:GitFilesExit(job, status) abort
     let lines = getbufline(s:gitfiles_buf, 1, '$')
 
     call setqflist([], 'r')
@@ -1338,7 +1340,7 @@ augroup PluginCopyPath
 augroup END
 
 augroup PluginLazygit
-  function! OpenLazygit()
+  function! s:OpenLazygit()
     " 1. 檢查是否安裝 lazygit
     if !executable('lazygit')
       echohl WarningMsg
@@ -1378,17 +1380,18 @@ augroup PluginLazygit
     call feedkeys("lazygit --screen-mode half" . "\<CR>")
   endfunction
 
-  nnoremap <leader>git :call OpenLazygit()<CR>
+  nnoremap <leader>git :call <SID>OpenLazygit()<CR>
 augroup END
 
 
 " <leader>st : 顯示 git status 中的檔案到 quickfix list，並開啟 quickfix window
-nnoremap <silent> <leader>st :call GitStatusQuickfix()<CR>
+" nnoremap <silent> <leader>st :call s:GitStatusQuickfix()<CR>  ❌ 要用<SID> 不然會得到<SID> not in a script context的錯誤
+nnoremap <silent> <leader>st :call <SID>GitStatusQuickfix()<CR>
 
 augroup PluginGit
   autocmd!
 
-  function! GitStatusQuickfix()
+  function! s:GitStatusQuickfix()
     execute 'lcd' fnameescape(expand('%:p:h'))
 
     let l:output = system('git status -s')
@@ -1432,7 +1435,7 @@ augroup PluginGit
   sign define GitChange text=│ texthl=DiffChange
   sign define GitDelete text=│ texthl=DiffDelete
 
-  function! UpdateGitSigns()
+  function! s:UpdateGitSigns()
     " 1. 取得當前 buffer 的編號與路徑
     let l:buf = bufnr('')
     let l:file = expand('%:p')
@@ -1507,9 +1510,9 @@ augroup PluginGit
   endfunction
 
   " 當存檔或進入緩衝區時自動更新
-  autocmd BufReadPost,BufWritePost,CursorHold,CursorHoldI,BufEnter * call UpdateGitSigns()
+  autocmd BufReadPost,BufWritePost,CursorHold,CursorHoldI,BufEnter * call s:UpdateGitSigns()
 
-  function! GitGutterJump(direction)
+  function! s:GitGutterJump(direction)
     " if &diff
     "   " 在diff模式下直接執行原生命令。詳: `:help diff` 再搜尋: &diff
     "   execute 'normal! ' . (a:direction == 'next' ? ']c' : '[c')
@@ -1561,20 +1564,21 @@ augroup PluginGit
       echo "No more changes in this direction."
     endif
   endfunction
-  " nnoremap ]c :call GitGutterJump('next')<CR>
-  " nnoremap [c :call GitGutterJump('prev')<CR>
+  " nnoremap ]c :call <SID>GitGutterJump('next')<CR>
+  " nnoremap [c :call <SID>GitGutterJump('prev')<CR>
   " 用以下的方式更好, 就不需要將&diff的判斷寫在 GitGutterJump 之中
-  nnoremap <expr> ]c &diff ? ']c' : ':call GitGutterJump("next")<CR>'
-  nnoremap <expr> [c &diff ? '[c' : ':call GitGutterJump("prev")<CR>'
+  " Note: call的方式，如果要註名用sciprt的函數，要用<SID>, 用 :s 會錯
+  nnoremap <expr> ]c &diff ? ']c' : ':call <SID>GitGutterJump("next")<CR>'
+  nnoremap <expr> [c &diff ? '[c' : ':call <SID>GitGutterJump("prev")<CR>'
 augroup END
 
 " ==== PluginGitlog ====
 augroup PluginGitlog
   autocmd!
-  command! -range -nargs=* Gitlog call Gitlog(<range>, <line1>, <line2>, <q-args>)
+  command! -range -nargs=* Gitlog call s:Gitlog(<range>, <line1>, <line2>, <q-args>)
 augroup END
 
-function! Gitlog(range, line1, line2, args) abort
+function! s:Gitlog(range, line1, line2, args) abort
   " help
   if a:args ==# '-h'
     echo 'Gitlog help'
@@ -1642,10 +1646,10 @@ endfunction
 " let g:markdown_folding = 1
 augroup PluginMarkdownPreview
   autocmd!
-  autocmd FileType markdown call MarkdownSetup()
+  autocmd FileType markdown call s:MarkdownSetup()
   "autocmd FileType markdown call GenerateMarkdownTOC() " 要用到的時候在自動建會比較好
 
-  function! MarkdownSetup()
+  function! s:MarkdownSetup()
     " 摺疊 Markdown 標題
     " Caution: 當使用了`filetype plugin indent on` 會導入 `$VIMRUNTIME/ftplugin/markdown.vim`
     " https://github.com/tpope/vim-markdown/blob/f9f845f28f4da33a7655accb22f4ad21f7d9fb66/ftplugin/markdown.vim#L82-L87
@@ -1678,8 +1682,8 @@ augroup PluginMarkdownPreview
     return '='
   endfunction
 
-  autocmd FileType markdown command! -buffer MdRead call MarkdownReadMode()
-  function! MarkdownReadMode()
+  autocmd FileType markdown command! -buffer MdRead call s:MarkdownReadMode()
+  function! s:MarkdownReadMode()
     "" 自動換行
     setlocal wrap
 
@@ -1721,14 +1725,14 @@ augroup PluginMarkdownPreview
     nnoremap <buffer> <Tab> za
   endfunction
 
-  autocmd FileType markdown,txt command! -buffer MdTOC call GenerateMarkdownTOC()
+  autocmd FileType markdown,txt command! -buffer MdTOC call s:GenerateMarkdownTOC()
   autocmd FileType markdown,txt nnoremap <buffer> <leader>wt  :MdTOC<CR>
   "function! GenerateMarkdownTOC()
   "  silent! execute 'lvimgrep /^#\+\s\+/ %'
   "  lopen
   "endfunction
 
-  function! GenerateMarkdownTOC()
+  function! s:GenerateMarkdownTOC()
     let lines = getline(1, '$')
     let toc = []
     let in_code = 0
@@ -1747,10 +1751,10 @@ augroup END
 
 augroup MarkdownConceal
   autocmd!
-  autocmd FileType markdown call MarkdownConceal()
+  autocmd FileType markdown call s:MarkdownConceal()
 augroup END
 
-function! MarkdownConceal()
+function! s:MarkdownConceal()
   " Note: conceallevel=2 會自動做 bold, italic
   setlocal conceallevel=2
 
@@ -1833,8 +1837,8 @@ endfunction
 " ============================================================
 augroup MarkdownHighlight
   autocmd!
-  autocmd FileType markdown call MarkdownHighlight()
-  function! MarkdownHighlight()
+  autocmd FileType markdown call s:MarkdownHighlight()
+  function! s:MarkdownHighlight()
     "--- Level 1: 主標題 (紅色系) ---
     "syntax match MdH1 /^# .*$/
     syntax match MdH1 /^# .\{0,120}\.*$/  contains=MdH1Mark
@@ -1916,10 +1920,10 @@ augroup PluginRg
   autocmd!
   let s:rg_buf = -1
   let s:rg_is_files = 0
-  command! -nargs=* Rg call Rg(<q-args>)
+  command! -nargs=* Rg call s:Rg(<q-args>)
 augroup END
 
-function! Rg(args) abort
+function! s:Rg(args) abort
   if !executable('rg')
     echohl ErrorMsg
     echom 'rg not found'
@@ -1989,14 +1993,14 @@ function! Rg(args) abort
         \ [&shell, &shellcmdflag, cmd],
         \ {
         \ 'curwin': v:true,
-        \ 'exit_cb': function('RgExit')
+        \ 'exit_cb': function('s:RgExit')
         \ })
 
   startinsert
 
 endfunction
 
-function! RgExit(job, status) abort
+function! s:RgExit(job, status) abort
   let lines = getbufline(s:rg_buf, 1, '$')
   " 1. 先清理所有 ANSI 與特殊字元 即: 如果行首包含非字母/路徑符號，直接將其截斷 (使得不會將視覺指標也算進去)
   call map(lines, 'substitute(v:val, "\e\\[[0-9;]*[mK]", "", "g")')
@@ -2066,18 +2070,18 @@ augroup PluginMarkdownCheckList
         \ let g:checklist_todo_count = 0 |
         \ let g:checklist_done_count = 0
 
-  autocmd BufRead,BufWritePost *.md,*.txt call MarkChecklists()
-  " autocmd TextChanged,TextChangedI *.md,*.txt call MarkChecklists()  " 這可能有點吃效能
+  autocmd BufRead,BufWritePost *.md,*.txt call s:MarkChecklists()
+  " autocmd TextChanged,TextChangedI *.md,*.txt call s:MarkChecklists()  " 這可能有點吃效能
 
-  " nnoremap ]t :call NextTodo()<CR>
-  " nnoremap [t :call PrevTodo()<CR>
+  " nnoremap ]t :call s:NextTodo()<CR>
+  " nnoremap [t :call s:PrevTodo()<CR>
   " Note: 可以先呼叫後，用 :@: 接上一個command, 接著可以用 @@ 來重複
-  autocmd FileType markdown,text   command! -buffer NextTodo call NextTodo()
-  autocmd FileType markdown,text   command! -buffer PrevTodo call PrevTodo()
+  autocmd FileType markdown,text   command! -buffer NextTodo call s:NextTodo()
+  autocmd FileType markdown,text   command! -buffer PrevTodo call s:PrevTodo()
 augroup END
 
 " 簡單 function 標記 checklist
-function! MarkChecklists()
+function! s:MarkChecklists()
   let l:group = 'MarkdownCheckList'
 
   " 全域變數儲存計數（用來顯示在 statusline）
@@ -2123,12 +2127,12 @@ endfunction
 
 " ==================== 跳轉功能 ====================
 " 跳到下一個未完成項目
-function! NextTodo()
+function! s:NextTodo()
   call search('^\s*-\s\[[^xXvV]\]', 'W')
 endfunction
 
 " 跳到上一個未完成項目
-function! PrevTodo()
+function! s:PrevTodo()
   call search('^\s*-\s\[[^xXvV]\]', 'bW')
 endfunction
 
@@ -2137,11 +2141,11 @@ endfunction
 augroup PluginPreviewImg
   autocmd!
   " Caution: 不要倚靠 mode() 在n, v下都是得到n
-  nnoremap gi :call PreviewImage('n')<CR>
-  xnoremap gi y:call PreviewImage('v')<CR>
+  nnoremap gi :call <SID>PreviewImage('n')<CR>
+  xnoremap gi y:call <SID>PreviewImage('v')<CR>
 augroup END
 
-function! PreviewImage(mode) abort
+function! s:PreviewImage(mode) abort
   " 1. 判斷作業系統
   let l:os = system('uname -s 2>/dev/null')->trim()
   " echohl Label | echo "DEBUG: OS: " . l:os | echohl None
@@ -2220,20 +2224,20 @@ augroup PluginSim
   endif
   let g:loaded_input_method = 1
 
-  autocmd InsertEnter  *      call InputMethodEnable()
-  autocmd InsertLeave  *      call InputMethodDisable()
+  autocmd InsertEnter  *      call s:InputMethodEnable()
+  autocmd InsertLeave  *      call s:InputMethodDisable()
 
   " vim 沒有以下的這些event, nvim才有
-  " autocmd TermOpen       *  call InputMethodDisable()
-  " autocmd TermEnter      *  call InputMethodEnable()
-  " autocmd TermLeave      *  call InputMethodDisable()
-  autocmd TerminalOpen     *  call InputMethodDisable()
-  " autocmd TerminalEnter  *  call InputMethodEnable()
-  " autocmd TerminalLeave  *  call InputMethodDisable()
+  " autocmd TermOpen       *  call s:InputMethodDisable()
+  " autocmd TermEnter      *  call s:InputMethodEnable()
+  " autocmd TermLeave      *  call s:InputMethodDisable()
+  autocmd TerminalOpen     *  call s:InputMethodDisable()
+  " autocmd TerminalEnter  *  call s:InputMethodEnable()
+  " autocmd TerminalLeave  *  call s:InputMethodDisable()
 
-  autocmd CmdlineEnter [/?]   call InputMethodEnable()
-  autocmd CmdlineLeave [/?]   call InputMethodDisable()
-  autocmd CmdlineEnter :      call InputMethodDisable()
+  autocmd CmdlineEnter [/?]   call s:InputMethodEnable()
+  autocmd CmdlineLeave [/?]   call s:InputMethodDisable()
+  autocmd CmdlineEnter :      call s:InputMethodDisable()
 augroup END
 
 
@@ -2253,7 +2257,7 @@ endfunction
 " 啟用輸入法
 "---------------------------------------
 
-function! InputMethodEnable() abort
+function! s:InputMethodEnable() abort
   if s:IsLinux()
     if executable('fcitx5-remote')
       let l:state = str2nr(system('fcitx5-remote'))
@@ -2278,7 +2282,7 @@ endfunction
 " 關閉輸入法
 "---------------------------------------
 
-function! InputMethodDisable() abort
+function! s:InputMethodDisable() abort
   if s:IsLinux()
     if executable('fcitx5-remote')
       let l:state = str2nr(system('fcitx5-remote'))
