@@ -605,6 +605,7 @@ endfunction
 
 " Caution: 一定要補上`filetype plugin indent on`，那麼用 &commentstring " 才會是給正確的
 " Note: `filetype plugin indent on` 也可以讓 `=` 的格式化正確, 如果沒有開啟用 " = 不會對
+" Note: `filetype plugin indent on` 會載入 $VIMRUNTIME/ftplugin/ 相關的檔案，例如: `$VIMRUNTIME/ftplugin/markdown.vim` 和 indent 檔案, 因此有的設定會被覆寫
 filetype plugin indent on
 packadd comment
 " function! ToggleComment()
@@ -1637,6 +1638,8 @@ endfunction
 " ============================================================
 " Markdown
 " ============================================================
+" 如果是要用: https://github.com/tpope/vim-markdown/blob/f9f845f28f4da33a7655accb22f4ad21f7d9fb66/ftplugin/markdown.vim#L82-L87 中的設定，那麼`g:markdown_folding`要提早設定才會有用
+" let g:markdown_folding = 1
 augroup PluginMarkdownPreview
   autocmd!
   autocmd FileType markdown call MarkdownSetup()
@@ -1644,12 +1647,18 @@ augroup PluginMarkdownPreview
 
   function! MarkdownSetup()
     " 摺疊 Markdown 標題
+    " Caution: 當使用了`filetype plugin indent on` 會導入 `$VIMRUNTIME/ftplugin/markdown.vim`
+    " https://github.com/tpope/vim-markdown/blob/f9f845f28f4da33a7655accb22f4ad21f7d9fb66/ftplugin/markdown.vim#L82-L87
+    " 當中的名稱是用: MarkdownFold, 因此導入的順序會有關係, 如果要避免衝突就不要用同名, 比較好的方式也可以用成s: 如此函數會曉得是抓script的函數
+    " 也可以考慮設定: `let g:markdown_folding = 1` 用markdown.vim的內容就好
+    " let g:markdown_folding = 1   " ❌ 這會沒有效果，如果要用markdown.vim要盡早設定才會有用
     setlocal foldmethod=expr
-    setlocal foldexpr=MarkdownFold(v:lnum)
+    " setlocal foldexpr=MarkdownFold(v:lnum)  " 這會和 markdown.vim 的函數名稱搞混, 使得沒有效果
+    setlocal foldexpr=s:MarkdownFold(v:lnum)
     normal! zR
   endfunction
 
-  function! MarkdownFold(lnum)
+  function! s:MarkdownFold(lnum)
     let line = getline(a:lnum)
 
     if line =~ '^# '
