@@ -609,7 +609,12 @@ endfunction
 " Note: `filetype plugin indent on` 也可以讓 `=` 的格式化正確, 如果沒有開啟用 " = 不會對
 " Note: `filetype plugin indent on` 會載入 $VIMRUNTIME/ftplugin/ 相關的檔案，例如: `$VIMRUNTIME/ftplugin/markdown.vim` 和 indent 檔案, 因此有的設定會被覆寫
 filetype plugin indent on
-packadd comment
+
+" Note: `:e $VIMRUNTIME/pack/dist/opt/`  這邊可以找到內建的plugin
+if isdirectory(expand('$VIMRUNTIME/pack/dist/opt/comment/'))
+  " version 9.1.697 這個版本沒有此內建插件, 要到 9.1.1752 才有
+  packadd comment
+endif
 " function! ToggleComment()
 "   if empty(&commentstring)
 "     echo 'No commentstring defined for this filetype!'
