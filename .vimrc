@@ -719,7 +719,13 @@ endfunction
 
 augroup YankHighlight
   autocmd!
-  autocmd TextYankPost * call s:HighlightYank()
+  if isdirectory(expand('$VIMRUNTIME/pack/dist/opt/hlyank'))
+    " https://github.com/vim/vim/blob/e31ec2ef06c7cc4ec080f2ec64923e080680128f/runtime/pack/dist/opt/hlyank/plugin/hlyank.vim#L1-L69
+    " 能完美: 包含多列的yank也可以成功
+    packadd hlyank
+  else
+    autocmd TextYankPost * call s:HighlightYank()
+  endif
 augroup END
 
 function! s:HighlightYank()
