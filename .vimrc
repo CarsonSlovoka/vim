@@ -1341,7 +1341,11 @@ augroup PluginCopyPath
 
     let selected = options[choice - 1]
 
-    let @+ = selected
+    if has('clipboard')
+      let @+ = selected
+    else
+      let @" = selected
+    endif
 
     " echo '✅ Copied: ' . selected
   endfunction
