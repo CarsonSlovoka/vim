@@ -422,7 +422,17 @@ tnoremap <C-r> <C-w>"
 " endfunction
 " tnoremap <silent> <Leader><Leader>c <C-\><C-n>:call ClearTerminal()<CR>
 " tnoremap <Leader><Leader>c <C-\><C-n>iclear<CR> " 同下 (往上滾還是會看到)
-tnoremap <Leader>c <C-\><C-n>i<C-l>
+tnoremap <leader>c <C-\><C-n>i<C-l>
+
+xnoremap <leader><F5> :call <SID>RunSelection()<CR>
+function! s:RunSelection() abort
+  lcd  %:p:h
+  normal! gvy
+  let l:selected = getreg('"')
+  :term
+  call feedkeys(l:selected . "\<CR>")
+endfunction
+
 
 " 🟧 digraphs
 augroup Digraphs
