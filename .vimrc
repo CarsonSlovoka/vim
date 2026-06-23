@@ -729,6 +729,16 @@ endfunction
 
 
 " 🟧 autocmd
+augroup SyntaxConceal
+  autocmd!
+
+  " json文件下conceallevel=2就會自動將key, value的quote給隱藏
+  " sy match jsonEndCommon /,$/ conceal
+  autocmd FileType json,json5
+        \ setlocal conceallevel=2
+
+augroup END
+
 "augroup YankHighlight  " 在vi不能這樣用，沒有lua能用
 "  autocmd!
 "  autocmd TextYankPost * silent! lua vim.highlight.on_yank({higroup='IncSearch', timeout=700})
