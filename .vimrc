@@ -1777,7 +1777,20 @@ augroup PluginMarkdownPreview
   endfunction
 
   autocmd FileType markdown,txt command! -buffer MdTOC call s:GenerateMarkdownTOC()
-  autocmd FileType markdown,txt nnoremap <buffer> <leader>wt  :MdTOC<CR>
+
+  if isdirectory(expand('$VIMRUNTIME/pack/dist/opt/helptoc'))
+    " `:e $VIMRUNTIME/pack/dist/opt/helptoc/autoload/helptoc.vim`
+    " " 可選設定
+    " let g:helptoc = {}
+    " let g:helptoc.popup_borderhighlight = ['Tag']
+
+    " https://github.com/vim/vim/blob/d167c50de4b954e5ddd97208187c5b3b77dd89cc/runtime/pack/dist/opt/helptoc/autoload/helptoc.vim#L1-L1341
+    packadd helptoc
+    nnoremap <leader>wt  :HelpToc<CR>
+  else
+    autocmd FileType markdown,txt nnoremap <buffer> <leader>wt  :MdTOC<CR>
+  endif
+
   "function! GenerateMarkdownTOC()
   "  silent! execute 'lvimgrep /^#\+\s\+/ %'
   "  lopen
