@@ -433,6 +433,14 @@ function! s:RunSelection() abort
   call feedkeys(l:selected . "\<CR>")
 endfunction
 
+xnoremap <leader>: :call <SID>RunCmd()<CR>
+function! s:RunCmd() abort
+  lcd  %:p:h
+  normal! gvy
+  let l:selected = getreg('"')
+  execute l:selected
+endfunction
+
 
 " 🟧 digraphs
 augroup Digraphs
