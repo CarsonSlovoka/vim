@@ -663,6 +663,9 @@ endif
 " nnoremap gcc :call ToggleComment()<CR>
 " vnoremap gc :call ToggleComment()<CR>
 
+if isdirectory(expand('$VIMRUNTIME/pack/dist/opt/matchit'))
+  packadd matchit
+endif
 
 augroup Formatting
   autocmd!
