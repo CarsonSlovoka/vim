@@ -737,6 +737,14 @@ augroup SyntaxConceal
   autocmd FileType json,json5
         \ setlocal conceallevel=2
 
+  " 直接隱藏所有的分號，缺點是註解的內容也會被影響
+  " " Caution: 這樣會沒用，因為會受到一個syntax的影響 `:syntax list xmlString`
+  " " 如果要有作用，要用 syntax off, 再使用才會有. 在autocmd寫syntax
+  " " off也不一定有用, 因為也要區分載入的時機
+  " autocmd FileType xml
+  "   \ setlocal conceallevel=2 |
+  "   \ sy match XmlQuote /"/ conceal
+
 augroup END
 
 "augroup YankHighlight  " 在vi不能這樣用，沒有lua能用
