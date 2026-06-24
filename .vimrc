@@ -1897,6 +1897,9 @@ function! s:MarkdownConceal()
   syntax match MdH5Mark '^##### '  contains=MdH5Head,MdHeadingTail
   syntax match MdH6Mark '^###### ' contains=MdH6Head,MdHeadingTail
 
+  " 除了表格其它的內容也會受到影響
+  " sy match MarkdownPipe /|/ conceal cchar=│
+  " sy match MarkdownDash /-/ conceal cchar=─
 endfunction
 
 " ============================================================
