@@ -402,6 +402,13 @@ vnoremap <leader>[ <Esc>`>a]<Esc>`<i[<Esc>
 nnoremap <leader>{ viw<Esc>`>a}<Esc>`<i{<Esc>
 vnoremap <leader>{ <Esc>`>a}<Esc>`<i{<Esc>
 
+" Inserts a blank line below/above the current line.
+" 以下例用mark回到原的位置, 是可行的，但是不支持count
+" nnoremap ]<Space> m`o<Esc>``
+" nnoremap [<Space> m`O<Esc>``
+nnoremap <silent> ]<Space> :<C-u>call append(line('.'), repeat([''], v:count1))<CR>
+nnoremap <silent> [<Space> :<C-u>call append(line('.')-1, repeat([''], v:count1)) \| exe 'norm!' v:count1.'k'<CR>
+
 " 將選取區塊下(J)/上(K)移一行
 " Note:
 " gv 重新選取
