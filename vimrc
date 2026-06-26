@@ -441,6 +441,21 @@ function! s:RunSelection() abort
   call feedkeys(l:selected . "\<CR>")
 
 endfunction
+autocmd FileType sh           nnoremap <buffer> <F5>  :call <SID>RunScript("bash")<CR>
+autocmd FileType python       nnoremap <buffer> <F5>  :call <SID>RunScript("python")<CR>
+autocmd FileType applescript  nnoremap <buffer> <F5>  :call <SID>RunScript("osascript")<CR>
+function s:RunScript(exeName)
+  let l:cur_filename = expand("%:t")
+  let l:cmd = printf("%s %s", a:exeName, l:cur_filename)
+  let choice = confirm(printf("run: `%s`?", l:cmd), "&Yes\n&Cancel", 2)
+  if choice ==# 2
+    return
+  endif
+
+  lcd  %:p:h
+  :term
+  call feedkeys( l:cmd . "\<CR>")
+endfunction
 
 xnoremap <leader>: :call <SID>RunCmd()<CR>
 function! s:RunCmd() abort
