@@ -431,8 +431,8 @@ tnoremap <C-r> <C-w>"
 " tnoremap <Leader><Leader>c <C-\><C-n>iclear<CR> " 同下 (往上滾還是會看到)
 tnoremap <leader>c <C-\><C-n>i<C-l>
 
-"xnoremap <leader><F5> :call <SID>RunSelection()<CR>   " Warn: 當只有這樣時，會遇到invalid range, 受到'<,'>的關係，要用<C-u>先清除
-xnoremap <leader><F5>  :<C-u>call <SID>RunSelection()<CR>
+"xnoremap <F5> :call <SID>RunSelection()<CR>   " Warn: 當只有這樣時，會遇到invalid range, 受到'<,'>的關係，要用<C-u>先清除
+xnoremap  <F5>  :<C-u>call <SID>RunSelection()<CR>
 function! s:RunSelection() abort
   lcd  %:p:h
   normal! gvy
